@@ -7,6 +7,8 @@ public class Cell : MonoBehaviour
 
     private Color defaultColor;
     private SpriteRenderer spriteRenderer;
+    private bool isContainObject = false;
+    public bool IsContainObject => isContainObject;
 
     private void Start()
     {
@@ -14,9 +16,19 @@ public class Cell : MonoBehaviour
         defaultColor = spriteRenderer.color;
     }
 
-    public void ActiveColor(bool isActive)
+    public void ActiveSelectVisual()
     {
-        spriteRenderer.color = isActive ? activeColor : defaultColor;
+        spriteRenderer.color = activeColor;
+    }
+
+    public void UnActiveSelectVisual()
+    {
+        spriteRenderer.color = defaultColor;
+    }
+
+    public void SetContainObjectTrue()
+    {
+        isContainObject = true;
     }
 
     public Vector2 GetPosition() => transform.position;
