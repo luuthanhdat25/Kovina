@@ -22,7 +22,7 @@ public class UINavigator : MonoBehaviour
     }
     public void animateBar()
     {
-        LeanTween.scaleX(bar, 10.04f, timeProcess).setOnComplete(PlayMenu);
+        LeanTween.scaleX(bar, 10.08f, timeProcess).setOnComplete(PlayMenu);
     }
     public void PlayMenu()
     {

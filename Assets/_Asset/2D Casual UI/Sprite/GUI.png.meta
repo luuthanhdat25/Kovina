@@ -551,10 +551,10 @@ TextureImporter:
       name: GUI_12
       rect:
         serializedVersion: 2
-        x: 2604
+        x: 2606
         y: 1673
-        width: 256
-        height: 61
+        width: 249
+        height: 60
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 29, y: 20, z: 31, w: 20}
