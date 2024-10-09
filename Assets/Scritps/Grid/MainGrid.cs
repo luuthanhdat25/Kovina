@@ -66,6 +66,7 @@ public class MainGrid : MonoBehaviour
     private Vector3 GetGirdCenterPosition()
     {
         Vector3 newPos = centerRect.position * CameraManager.Instance.ZoomRatio();
+        newPos.y = CameraManager.Instance.Camera.transform.position.y;
         return newPos;
     }
 }
