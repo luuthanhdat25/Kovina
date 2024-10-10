@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class UINavigator : MonoBehaviour
@@ -16,17 +17,17 @@ public class UINavigator : MonoBehaviour
 
     private void Start()
     {
-        animateBar();
+        AnimateBar();
         intoScene = GameObject.Find("MenuPage");
         intoScene.SetActive(false);
     }
-    public void animateBar()
+    public void AnimateBar()
     {
-        LeanTween.scaleX(bar, 10.08f, timeProcess).setOnComplete(PlayMenu);
+        LeanTween.scaleX(bar, 10f, timeProcess).setOnComplete(PlayMenu);
     }
     public void PlayMenu()
     {
-        controller.ChangUIApearence(currentScene,intoScene);
+        StartCoroutine(controller.ChangUIApearence(currentScene, intoScene));
         _uIController.SetTriggerAnimation();
     }
 
