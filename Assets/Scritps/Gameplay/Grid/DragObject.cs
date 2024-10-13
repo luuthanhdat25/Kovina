@@ -3,22 +3,8 @@ using UnityEngine;
 
 public class DragObject : MonoBehaviour
 {
-    private Vector3 offset; //Offset to Touch Position
-    private Vector2 startPosition; //Return to start Position if it can't find cell
-    
-    private bool canDrag = true;
-    private bool isDrag = false;
-    
     private List<Cell> cellInteractList = new List<Cell>();
     private Cell activeCell; 
-
-    private void OnMouseDown()
-    {
-        if (!canDrag) return;
-        isDrag = true;
-        offset = transform.position - GetTouchPosition();
-        startPosition = transform.position;
-    }
 
     private Vector3 GetTouchPosition()
     {
@@ -27,41 +13,27 @@ public class DragObject : MonoBehaviour
         return mousePosition;
     }
 
-    /// <summary>
-    /// Find cell to snap
-    /// if find, it snap to neast cell
-    /// else it move back to start position
-    /// </summary>
-    private void OnMouseUp()
+    public bool SetPlaceInCell()
     {
-        if (!canDrag) return;
-        isDrag = false;
-
         if (activeCell != null)
         {
             transform.position = activeCell.transform.position;
-            canDrag = false;
-
             activeCell.UnActiveSelectVisual();
             activeCell.SetContainObjectTrue();
             activeCell = null;
-            canDrag = false;
             cellInteractList.Clear();
+            return true;
         }
-        else
-        {
-            transform.position = startPosition;
-        }
+        return false;
     }
 
-    /// <summary>
-    /// Move object follow touch and finding neast cell
-    /// </summary>
-    private void OnMouseDrag()
+    public void SetPositionFollowUserInput()
     {
-        if (!canDrag || !isDrag) return;
-        transform.position = GetTouchPosition() + offset;
+        transform.position = GetTouchPosition();
+    }
 
+    public void SetActiveCell()
+    {
         Cell nearestCell = GetNearestCell();
         if (nearestCell != null && nearestCell != activeCell)
         {
@@ -97,8 +69,6 @@ public class DragObject : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!canDrag || !isDrag) return;
-
         Cell cell = collision.gameObject.GetComponent<Cell>();
         if (cell != null && !cellInteractList.Contains(cell) && !cell.IsContainObject)
         {
@@ -108,8 +78,6 @@ public class DragObject : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (!canDrag || !isDrag) return;
-
         Cell cell = collision.gameObject.GetComponent<Cell>();
         if (cell != null && cellInteractList.Contains(cell))
         {
