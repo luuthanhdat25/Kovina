@@ -1,7 +1,4 @@
-﻿using Crystal;
-using System;
-using System.Drawing;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class MainGrid : MonoBehaviour
 {
@@ -39,8 +36,7 @@ public class MainGrid : MonoBehaviour
 
         float gridWidth = (widthSize * cellScale.x) + ((widthSize - 1) * widthPadding);
         float gridHeight = (heightSize * cellScale.y) + ((heightSize - 1) * heightPadding);
-        Debug.Log($"width: {gridWidth}, gridHeight: {gridHeight}");
-        CameraManager.Instance.SetSize(gridHeight, gridWidth, heightSize, widthSize);
+        CameraManager.Instance.SetSize(gridHeight, gridWidth);
 
         Vector3 girdCenterPosition = GetGirdCenterPosition();
 
