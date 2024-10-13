@@ -25,15 +25,7 @@ public class DraggableUI : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndD
         Vector2 mousePositionOnUI;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform.parent as RectTransform,
             eventData.position, eventData.pressEventCamera, out mousePositionOnUI);
-        rectTransform.anchoredPosition = mousePositionOnUI - GetPivotOffset();
-    }
-
-    protected virtual Vector2 GetPivotOffset()
-    {
-        return new Vector2(
-           rectTransform.rect.width * rectTransform.pivot.x,
-           rectTransform.rect.height * rectTransform.pivot.y
-        );
+        rectTransform.anchoredPosition = mousePositionOnUI;
     }
 
     public virtual void OnEndDrag(PointerEventData eventData)

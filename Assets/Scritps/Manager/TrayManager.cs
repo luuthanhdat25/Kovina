@@ -7,21 +7,41 @@ public class TrayManager : Singleton<TrayManager>
     [Header("Components"), Space(6)]
     [SerializeField] private Transform trayPrefab;
     [SerializeField] private Transform trayHolder;
+    [SerializeField] private TrayUIContainer trayUIContainer;
 
-    private List<Tray> trayList = new List<Tray>();
+    private List<Tray> trayUnplaced = new List<Tray>();
+    private List<Tray> trayPlaced = new List<Tray>();
     private Tray trayPresent;
+
+    private int countTrayPlaced = 0;
 
     private void Start()
     {
-        CreateTray(new Vector3(1000, 0, 0)).gameObject.SetActive(false);
-        CreateTray(new Vector3(1000, 0, 0)).gameObject.SetActive(false);
-        CreateTray(new Vector3(1000, 0, 0)).gameObject.SetActive(false);
+        CreateUnplacedTray(0, new Vector3(1000, 0, 0)).gameObject.SetActive(false);
+        CreateUnplacedTray(1, new Vector3(1000, 0, 0)).gameObject.SetActive(false);
+        CreateUnplacedTray(2, new Vector3(1000, 0, 0)).gameObject.SetActive(false);
+    }
+
+    public void OnTrayPlaced()
+    {
+        countTrayPlaced = countTrayPlaced + 1;
+        if (countTrayPlaced >= 3)
+        {
+            countTrayPlaced = 0;
+            for (int i = 0; i < trayUnplaced.Count; i++)
+                trayPlaced.Add(trayUnplaced[i]);
+
+            trayUnplaced.Clear();
+            for (int i = 0; i < 3; i++)
+                CreateUnplacedTray(i, new Vector3(1000, 0, 0)).gameObject.SetActive(false);
+            trayUIContainer.OnEnableTraysUI();
+        }
     }
 
     #region CRUD
 
     //CREATE -------------------------------------------------------------
-    public Transform CreateTray(Vector3 trayPosition = default(Vector3), Quaternion quaternion = default(Quaternion))
+    public Tray CreateUnplacedTray(int index, Vector3 trayPosition = default(Vector3), Quaternion quaternion = default(Quaternion))
     {
         //TODO: Upgrade to object pooling design pattern to optimize performance
         Transform newTray = Instantiate(trayPrefab, trayPosition, quaternion);
@@ -33,34 +53,55 @@ public class TrayManager : Singleton<TrayManager>
         }
 
         Tray trayComponent = newTray.GetComponent<Tray>();
-        AddNewTrayToList(trayComponent);
+        AddNewTrayToUnplaced(trayComponent);
+        trayComponent.Init(index);
 
         newTray.SetParent(trayHolder);
-        return newTray;
+        return trayComponent;
     }
 
-    private void AddNewTrayToList(Tray trayComponent)
+    private void AddNewTrayToUnplaced(Tray trayComponent)
     {
-        if (trayList == null)
+        if (trayUnplaced == null)
         {
-            Debug.Log("TrayManager: trayList has not been initialized. Initializing now...");
-            trayList = new List<Tray>();
+            Debug.Log("TrayManager: trayUnplaced has not been initialized. Initializing now...");
+            trayUnplaced = new List<Tray>();
         }
         
-        trayList.Add(trayComponent);
-        Debug.Log($"TrayManager: add {trayComponent} element to trayList |SUCCESS|");
+        trayUnplaced.Add(trayComponent);
+        Debug.Log($"TrayManager: add {trayComponent} element to trayUnplaced |SUCCESS|");
+    }
+
+    private void AddNewTrayToPlaced(int index)
+    {
+        if (trayPlaced == null)
+        {
+            Debug.Log("TrayManager: trayPlaced has not been initialized. Initializing now...");
+            trayPlaced = new List<Tray>();
+        }
+
+        if (trayUnplaced[index] == null)
+        {
+            Debug.LogWarning($"TrayManager: Tray at index {index} is null, cannot add to placed |FAIL|");
+            return;
+        }
+
+        Tray trayComponent = trayUnplaced[index];
+        trayPlaced.Add(trayComponent);
+        //trayUnplaced.Remove(trayComponent);
+        Debug.Log($"TrayManager: add {trayComponent} element to trayPlaced |SUCCESS|");
     }
 
     //READ ----------------------------------------------------------------
-    public Tray GetTray(int index)
+    public Tray GetTraUnplace(int index)
     {
-        if (index < 0 || index >= trayList.Count)
+        if (index < 0 || index >= trayUnplaced.Count)
         {
-            Debug.LogWarning($"Developer, Please ensure the index is within the range (0 to {trayList.Count - 1})");
+            Debug.LogWarning($"Developer, Please ensure the index is within the range (0 to {trayUnplaced.Count - 1})");
             Debug.LogWarning($"TrayManager: Invalid index {index}.");
             return null;
         }
-        return trayList[index];
+        return trayUnplaced[index];
     }
 
     //UPDATE --------------------------------------------------------------
@@ -69,7 +110,7 @@ public class TrayManager : Singleton<TrayManager>
 
     private void ChangeTrayStatusEnable(int index, bool status)
     {
-        Tray trayComponent = GetTray(index);
+        Tray trayComponent = GetTraUnplace(index);
         if (trayComponent == null)
         {
             Debug.LogWarning($"TrayManager: Tray at index {index} is null or doesn't exist |FAIL|");

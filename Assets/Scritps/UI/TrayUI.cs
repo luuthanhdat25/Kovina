@@ -12,15 +12,22 @@ public class TrayUI : DraggableUI
     [SerializeField] private RectTransform rectTransformParent;
     [SerializeField] private RectTransform pointCenter;
 
+    private int id;
     private Vector3 startPosition;
+    private Vector3 pointCenterPosition;
     private bool isPlaySequence = false;
+
+    private void OnEnable()
+    {
+        id = transform.GetSiblingIndex();
+        pointCenterPosition = pointCenter.anchoredPosition;
+        startPosition = rectTransform.anchoredPosition;
+    }
 
     public override void OnBeginDrag(PointerEventData eventData)
     {
         if (isPlaySequence) return;
         base.OnBeginDrag(eventData);
-
-        startPosition = pointCenter.anchoredPosition;
     }
 
     public override void OnDrag(PointerEventData eventData)
@@ -46,22 +53,28 @@ public class TrayUI : DraggableUI
 
     private void SetTrayGameobjectStatus(bool status)
     {
-        int index = transform.GetSiblingIndex();
-        Tray trayComponent = TrayManager.Instance.GetTray(index);
-
+        Tray trayComponent = TrayManager.Instance.GetTraUnplace(id);
         trayComponent.gameObject.SetActive(status);
         trayComponent.SetPositionFollowUserInput();
         trayComponent.SetActiveCell();
     }
 
-    private void TrackPlaceActiveCell()
+    private bool TrackPlaceActiveCell()
     {
         int index = transform.GetSiblingIndex();
-        Tray trayComponent = TrayManager.Instance.GetTray(index);
+        Tray trayComponent = TrayManager.Instance.GetTraUnplace(index);
         bool isPlace = trayComponent.SetPlaceInCell();
 
-        if (isPlace) trayComponent.gameObject.SetActive(true);
-        else trayComponent.gameObject.SetActive(false);
+        SetPlaceStatus(trayComponent, isPlace);
+        if (isPlace) TrayManager.Instance.OnTrayPlaced();
+        return isPlace;
+    }
+
+    private void SetPlaceStatus(Tray trayComponent, bool isPlace)
+    {
+        Debug.Log($"TrayUI: Set placed status is {isPlace}");
+        trayComponent.gameObject.SetActive(isPlace);
+        gameObject.SetActive(!isPlace);
     }
 
     private bool IsOutsideBounds()
@@ -69,8 +82,8 @@ public class TrayUI : DraggableUI
         float widthSize = rectTransformParent.rect.width;
         float heightSize = rectTransformParent.rect.height;
 
-        float distanceWidth = Mathf.Abs(rectTransform.anchoredPosition.x - startPosition.x);
-        float distanceHeight = Mathf.Abs(rectTransform.anchoredPosition.y - startPosition.y);
+        float distanceWidth = Mathf.Abs(rectTransform.anchoredPosition.x - pointCenterPosition.x);
+        float distanceHeight = Mathf.Abs(rectTransform.anchoredPosition.y - pointCenterPosition.y);
         
         bool isOutsideWidth = distanceWidth > (widthSize / 2);
         bool isOutsideHeight = distanceHeight > (heightSize / 2);
@@ -82,7 +95,7 @@ public class TrayUI : DraggableUI
         if (isPlaySequence) return;
         base.OnEndDrag(eventData);
 
-        LeanTween.alphaCanvas(canvasGroup, 1f, DURATION_FADE).setEase(LeanTweenType.easeOutQuad);
+        canvasGroup.alpha = 1f;
         rectTransform.anchoredPosition = startPosition;
 
         EnableScaleAnimation();
@@ -90,16 +103,12 @@ public class TrayUI : DraggableUI
     }
 
     [ContextMenu("Enable scale animation")]
-    private void EnableScaleAnimation()
+    public void EnableScaleAnimation()
     {
-        Vector2 startPivot = rectTransform.pivot;
-        rectTransform.pivot = new Vector2(0.5f, 0.5f);
         isPlaySequence = true;
-
         LTSeq sequence = LeanTween.sequence();
         sequence.append(LeanTween.scale(rectTransform, Vector3.one * 1.1f, DURATION_SCALE).setEase(LeanTweenType.easeInSine));
         sequence.append(LeanTween.scale(rectTransform, Vector3.one, DURATION_SCALE).setEase(LeanTweenType.easeInSine));
-        sequence.append(() => rectTransform.pivot = startPivot);
         sequence.append(() => isPlaySequence = false);
     }
 }
