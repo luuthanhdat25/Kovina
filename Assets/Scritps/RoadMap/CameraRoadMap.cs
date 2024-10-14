@@ -32,15 +32,24 @@ public class CameraRoadMap : MonoBehaviour
         Vector2 startPos = backgroundRoadmap.GetStartPosition();
         Vector2 endPos = backgroundRoadmap.GetEndPosition();
         Vector2 size = backgroundRoadmap.GetBackroundSize();
+        Vector2 endMap1Pos = backgroundRoadmap.GetEndMap1Position();
 
         Debug.Log($"Start bg Pos: {startPos}, End bg Pos: {endPos}, Size bg: {size}");
 
-        // Set camera size
-        camera.orthographicSize = size.y / 2;
+        var witdthBackground = endMap1Pos.x - startPos.x;
 
-        float cameraHalfWidth = (size.y * camera.aspect) / 2;
+        // Set camera size
+        //camera.orthographicSize = size.y / 2;
+        camera.orthographicSize = witdthBackground / (2 * camera.aspect);
+
+        float cameraHalfWidth = witdthBackground / 2;
+        var backgroundHeight = witdthBackground / camera.aspect;
+        Debug.Log($"Background width and Height: {witdthBackground}, {backgroundHeight}");
+
 
         Vector3 cameraPosition = transform.position;
+        Vector3 firstBackgroundPosition = new Vector3(startPos.x + witdthBackground/2, cameraPosition.y); 
+        backgroundRoadmap.SetScaleAllBackground(witdthBackground, backgroundHeight, firstBackgroundPosition, camera.aspect);
         minLimitX = startPos.x + cameraHalfWidth;
         maxLimixX = endPos.x - cameraHalfWidth;
 
@@ -49,6 +58,7 @@ public class CameraRoadMap : MonoBehaviour
     }
     #endregion
 
+    #region Input Swipe
     void Update()
     {
         if (Input.touchCount > 0)
@@ -118,4 +128,5 @@ public class CameraRoadMap : MonoBehaviour
     {
         return camera.ScreenToWorldPoint(new Vector3(touchPosition.x, touchPosition.y, camera.nearClipPlane));
     }
+    #endregion
 }
