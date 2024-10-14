@@ -6,6 +6,8 @@ public class UIContronller : MonoBehaviour
 {
 
     private Animator _animator;
+    private UIEvenHandler controller = new UIEvenHandler();
+
 
     private void Start()
     {
@@ -29,5 +31,13 @@ public class UIContronller : MonoBehaviour
         {
             Debug.Log("is Exit");
         }
+    }
+    public void ChangeToSettingUI(GameObject setting)
+    {
+            StartCoroutine(controller.ChangUIApearence(this.gameObject, setting));
+    }
+    public void RollBackToMenuUI(GameObject setting)
+    {
+        StartCoroutine(controller.ChangUIApearence(setting,this.gameObject));
     }
 }
