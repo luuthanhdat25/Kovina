@@ -4,7 +4,7 @@ using UnityEngine;
 public class CameraRoadMap : MonoBehaviour
 {
     [SerializeField]
-    private BackgroundRoadmap backgroundRoadmap;
+    private BackgroundRoadmapGenerater backgroundRoadmap;
 
     [SerializeField]
     private float swipeThreshold = 1.0f;
@@ -31,25 +31,23 @@ public class CameraRoadMap : MonoBehaviour
     {
         Vector2 startPos = backgroundRoadmap.GetStartPosition();
         Vector2 endPos = backgroundRoadmap.GetEndPosition();
-        Vector2 size = backgroundRoadmap.GetBackroundSize();
         Vector2 endMap1Pos = backgroundRoadmap.GetEndMap1Position();
 
-        Debug.Log($"Start bg Pos: {startPos}, End bg Pos: {endPos}, Size bg: {size}");
-
-        var witdthBackground = endMap1Pos.x - startPos.x;
+        var witdthCameraScale = endMap1Pos.x - startPos.x;
 
         // Set camera size
-        //camera.orthographicSize = size.y / 2;
-        camera.orthographicSize = witdthBackground / (2 * camera.aspect);
+        camera.orthographicSize = witdthCameraScale / (2 * camera.aspect);
 
-        float cameraHalfWidth = witdthBackground / 2;
-        var backgroundHeight = witdthBackground / camera.aspect;
-        Debug.Log($"Background width and Height: {witdthBackground}, {backgroundHeight}");
+        float cameraHalfWidth = witdthCameraScale / 2;
+        var heightCameraScale = witdthCameraScale / camera.aspect;
+        Debug.Log($"Camera width and Height: {witdthCameraScale}, {heightCameraScale}");
 
 
         Vector3 cameraPosition = transform.position;
-        Vector3 firstBackgroundPosition = new Vector3(startPos.x + witdthBackground/2, cameraPosition.y); 
-        backgroundRoadmap.SetScaleAllBackground(witdthBackground, backgroundHeight, firstBackgroundPosition, camera.aspect);
+        Vector2 cameraScaleWorldSpace = new Vector2(witdthCameraScale, heightCameraScale);
+
+        backgroundRoadmap.SetupAllBackground(cameraScaleWorldSpace, camera.aspect);
+        
         minLimitX = startPos.x + cameraHalfWidth;
         maxLimixX = endPos.x - cameraHalfWidth;
 
