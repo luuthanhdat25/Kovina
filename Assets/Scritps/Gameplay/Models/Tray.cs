@@ -4,20 +4,31 @@ using UnityEngine;
 
 public class Tray : MonoBehaviour
 {
+    private readonly float Z_COORDINATE_MOVE = -1f;
+
     private int id;
+    private Vector3 positionStart = Vector3.zero;
+
     private List<Cell> cellInteractList = new List<Cell>();
     private Cell activeCell;
 
     public int Id => id;
+    
     public void Init(int id)
     {
         this.id = id;
+        positionStart = transform.position;
+    }
+
+    public void ResetCoordinate()
+    {
+        transform.position = positionStart;
     }
 
     private Vector3 GetTouchPosition()
     {
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mousePosition.z = transform.position.z;
+        mousePosition.z = positionStart.z + Z_COORDINATE_MOVE;
         return mousePosition;
     }
 

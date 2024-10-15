@@ -63,10 +63,15 @@ public class TrayUI : DraggableUI
     {
         int index = transform.GetSiblingIndex();
         Tray trayComponent = TrayManager.Instance.GetTraUnplace(index);
-        bool isPlace = trayComponent.SetPlaceInCell();
+        trayComponent.ResetCoordinate();
 
+        bool isPlace = trayComponent.SetPlaceInCell();
         SetPlaceStatus(trayComponent, isPlace);
-        if (isPlace) TrayManager.Instance.OnTrayPlaced();
+
+        if (isPlace)
+        {
+            TrayManager.Instance.OnTrayPlaced();
+        }
         return isPlace;
     }
 
