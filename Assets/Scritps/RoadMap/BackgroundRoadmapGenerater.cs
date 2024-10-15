@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class BackgroundRoadmapGenerater : MonoBehaviour
 {
@@ -27,7 +26,7 @@ public class BackgroundRoadmapGenerater : MonoBehaviour
             var startX = background.GetStartPosition().x + background.GetEndPosition().x;
             background.SetPosition(new Vector3(startX/2, background.transform.position.y, background.transform.position.z));
             
-            cloudSpawner.SetupCloud(background.GetEndPosition(), cameraScaleWorldSpace.y + 0.5f);
+            cloudSpawner.SpawnCloudParticle(background.GetEndPosition(), cameraScaleWorldSpace.y + 0.5f);
         }
     }
 

@@ -94,10 +94,10 @@ public class CameraRoadMap : MonoBehaviour
                     }
                     else
                     {
-                        Debug.Log("Swipe to small");
+                        //Debug.Log("Swipe to small");
                     }
 
-                    Debug.Log("Swipe velocity: " + swipeVelocity);
+                    //Debug.Log("Swipe velocity: " + swipeVelocity);
                     break;
             }
         }

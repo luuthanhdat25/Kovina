@@ -1,43 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Cloud : MonoBehaviour
 {
-    private bool movingToEnd;
-    private float moveProgress;
-    private float moveSpeed;
-    private Vector3 startPosition;
-    private Vector3 endPosition;
+    [SerializeField]
+    private ParticleSystem cloudParticle;
+
+    private const float SIMULATE_TIME_BEFORE_PLAY = 15F;
 
     void Start()
     {
-        moveProgress = UnityEngine.Random.Range(0f, 1f);
-        movingToEnd = UnityEngine.Random.Range(0f, 1f) > 0.5f;
+        cloudParticle.Simulate(SIMULATE_TIME_BEFORE_PLAY, true, true);
+        cloudParticle.Play();
     }
 
-    public void SetStartAndEndPosion(float xStart, float xEnd, float yCoordinate)
+    public void SetScale(Vector3 scale)
     {
-        startPosition = new Vector3(xStart, yCoordinate, transform.position.z);
-        endPosition = new Vector3(xEnd, yCoordinate, transform.position.z);
+        var shap = cloudParticle.shape;
+        shap.scale = scale;
     }
 
-    public void SetMoveSpeedbyTimeMove(float timeMove) => moveSpeed = 1f / timeMove;
-
-    void FixedUpdate()
-    {
-        MoveCloud();
-    }
-
-    private void MoveCloud()
-    {
-        moveProgress += (movingToEnd ? 1 : -1) * Time.fixedDeltaTime * moveSpeed;
-
-        transform.position = Vector3.Lerp(startPosition, endPosition, Mathf.Clamp01(moveProgress));
-
-        if (moveProgress >= 1f || moveProgress <= 0f)
-        {
-            movingToEnd = !movingToEnd;
-        }
-    }
+    public void SetPosition(Vector3 position) => transform.localPosition = position;
 }
