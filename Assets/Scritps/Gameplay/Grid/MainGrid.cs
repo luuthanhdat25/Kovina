@@ -2,6 +2,20 @@
 
 public class MainGrid : MonoBehaviour
 {
+    public enum BoxType
+    {
+        QuestionBox,
+        ExplosiveBox
+    }
+
+    [System.Serializable]
+    public struct Box
+    {
+        public BoxType Type;
+        public int XPosition;
+        public int YPosition;
+    }
+
     [SerializeField]
     private Cell cellPrefab;
 
@@ -22,6 +36,15 @@ public class MainGrid : MonoBehaviour
     [SerializeField]
     private RectTransform centerRect;
 
+    [SerializeField]
+    private QuestionBox questionBoxPrefab;
+
+    [SerializeField]
+    private ExplosiveBox explosiveBoxPrefab;
+
+    [SerializeField]
+    private Box[] boxSetUps;
+
     private Cell[,] cellArray;
 
     void Start()
@@ -31,7 +54,14 @@ public class MainGrid : MonoBehaviour
 
     private void InitialGrid()
     {
-        cellArray = new Cell[heightSize, widthSize];
+        InitialCells();
+
+        InitialBoxs();
+    }
+
+    private void InitialCells()
+    {
+        cellArray = new Cell[widthSize, heightSize];
         Vector2 cellScale = cellPrefab.GetScale();
 
         float gridWidth = (widthSize * cellScale.x) + ((widthSize - 1) * widthPadding);
@@ -42,19 +72,47 @@ public class MainGrid : MonoBehaviour
 
         Vector3 startPos = new Vector2(girdCenterPosition.x - gridWidth / 2, girdCenterPosition.y - gridHeight / 2) + cellScale / 2;
 
-        for (int i = 0; i < heightSize; i++)
+        for (int i = 0; i < widthSize; i++)
         {
-            for (int j = 0; j < widthSize; j++)
+            for (int j = 0; j < heightSize; j++)
             {
                 Cell newCell = Instantiate(cellPrefab);
                 newCell.transform.SetParent(transform);
                 newCell.name = $"Cell {i}, {j}";
 
-                float posX = startPos.x + j * (widthPadding + cellScale.x);
-                float posY = startPos.y + i * (heightPadding + cellScale.y);
+                float posX = startPos.x + i * (widthPadding + cellScale.x);
+                float posY = startPos.y + j * (heightPadding + cellScale.y);
                 newCell.transform.position = new Vector2(posX, posY);
 
                 cellArray[i, j] = newCell;
+            }
+        }
+    }
+
+    private void InitialBoxs()
+    {
+        foreach (var box in boxSetUps)
+        {
+            if (IsInGrid(box.XPosition, box.YPosition))
+            {
+                Cell cell = cellArray[box.XPosition, box.YPosition];
+                if (!cell.IsContainObject)
+                {
+                    switch (box.Type)
+                    {
+                        case BoxType.QuestionBox:
+                            QuestionBox questionBox = Instantiate(questionBoxPrefab, transform);
+                            questionBox.transform.position = cellArray[box.XPosition, box.YPosition].transform.position;
+                            break;
+
+                        case BoxType.ExplosiveBox:
+                            ExplosiveBox explosiveBox = Instantiate(explosiveBoxPrefab, transform);
+                            explosiveBox.transform.position = cellArray[box.XPosition, box.YPosition].transform.position;
+                            explosiveBox.SetCellPlace(cell);
+                            break;
+                    }
+                    cell.SetContainObjectTrue();
+                }
             }
         }
     }
@@ -63,5 +121,12 @@ public class MainGrid : MonoBehaviour
     {
         Vector3 newPos = centerRect.position * CameraManager.Instance.ZoomRatio();
         return newPos;
+    }
+
+    private bool IsInGrid(int x, int y)
+    {
+        if (x < 0 || y < 0) return false;
+        if (x >= widthSize || y >= heightSize) return false;
+        return true;
     }
 }
