@@ -20,7 +20,7 @@ public class UINavigator : MonoBehaviour
     {
         AnimateBar();
         intoUI = GameObject.Find("MenuPage");
-        settingUI = GameObject.Find("SettingPage");
+        settingUI = GameObject.Find("Panel_settingWindow");
         intoUI.SetActive(false);
         settingUI.SetActive(false);
     }
@@ -33,6 +33,6 @@ public class UINavigator : MonoBehaviour
         StartCoroutine(controller.ChangUIApearence(currentUI, intoUI));
         _uIController.SetTriggerAnimation();
     }
-  
+    
 
 }

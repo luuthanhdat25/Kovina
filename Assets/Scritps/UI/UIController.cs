@@ -1,13 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class UIContronller : MonoBehaviour
 {
 
     private Animator _animator;
     private UIEvenHandler controller = new UIEvenHandler();
-
+    public string panelId;
 
     private void Start()
     {
@@ -34,10 +36,12 @@ public class UIContronller : MonoBehaviour
     }
     public void ChangeToSettingUI(GameObject setting)
     {
-            StartCoroutine(controller.ChangUIApearence(this.gameObject, setting));
+        var itemMenu = GameObject.Find("Panel_ItemSystem");
+        StartCoroutine(controller.ChangUIApearence(itemMenu, setting));
     }
     public void RollBackToMenuUI(GameObject setting)
     {
         StartCoroutine(controller.ChangUIApearence(setting,this.gameObject));
     }
+    
 }

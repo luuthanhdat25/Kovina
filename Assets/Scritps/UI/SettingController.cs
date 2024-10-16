@@ -4,13 +4,18 @@ using UnityEngine;
 
 public class SettingController : MonoBehaviour
 {
-    public void ChangeVolume()
+    public void ChangeVolume(float volume)
     {
-        Debug.Log("is Changing Volume");
+        Debug.Log(volume);
     }
-    public void ChangeLangue()
+    public void ChangeLangue(int index)
     {
-        Debug.Log("is Changing Langue");
+        switch (index)
+        {
+            case 0: Debug.Log("Changed to VietNamese");break;
+            case 1: Debug.Log("Changed to Korea"); break;
+            case 2: Debug.Log("Changed to English"); break;
+        }
     }
 
 }
