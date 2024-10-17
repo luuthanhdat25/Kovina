@@ -2,29 +2,14 @@
 
 public class MainGrid : MonoBehaviour
 {
-    public enum BoxType
-    {
-        QuestionBox,
-        ExplosiveBox
-    }
-
-    [System.Serializable]
-    public struct Box
-    {
-        public BoxType Type;
-        public int XPosition;
-        public int YPosition;
-    }
-
     [SerializeField]
     private Cell cellPrefab;
 
-    [Header("[Cell size]")]
     [SerializeField]
-    private int widthSize;
+    private string levelLoadPath = "Level/Level_Grid_";
 
     [SerializeField]
-    private int heightSize;
+    private int levelNumber;
 
     [Header("[Cell Padding]")]
     [SerializeField]
@@ -42,25 +27,33 @@ public class MainGrid : MonoBehaviour
     [SerializeField]
     private ExplosiveBox explosiveBoxPrefab;
 
-    [SerializeField]
-    private Box[] boxSetUps;
-
     private Cell[,] cellArray;
 
     void Start()
     {
-        InitialGrid();
+        LevelGridSO levelGridData = Resources.Load<LevelGridSO>(levelLoadPath + levelNumber);
+        if(levelGridData != null)
+        {
+            InitialGrid(levelGridData);
+        }
+        else
+        {
+            Debug.LogWarning("File" + levelLoadPath + levelNumber + " doesn't exist!");
+        }
     }
 
-    private void InitialGrid()
+    private void InitialGrid(LevelGridSO levelGridSO)
     {
-        InitialCells();
+        InitialCells(levelGridSO);
 
-        InitialBoxs();
+        InitialBoxs(levelGridSO);
     }
 
-    private void InitialCells()
+    private void InitialCells(LevelGridSO levelGridSO)
     {
+        int widthSize = levelGridSO.WidthSize;
+        int heightSize = levelGridSO.HeighSize;
+
         cellArray = new Cell[widthSize, heightSize];
         Vector2 cellScale = cellPrefab.GetScale();
 
@@ -89,11 +82,11 @@ public class MainGrid : MonoBehaviour
         }
     }
 
-    private void InitialBoxs()
+    private void InitialBoxs(LevelGridSO levelGridSO)
     {
-        foreach (var box in boxSetUps)
+        foreach (var box in levelGridSO.BoxSetups)
         {
-            if (IsInGrid(box.XPosition, box.YPosition))
+            if (IsInGrid(box.XPosition, box.YPosition, levelGridSO))
             {
                 Cell cell = cellArray[box.XPosition, box.YPosition];
                 if (!cell.IsContainObject)
@@ -123,10 +116,10 @@ public class MainGrid : MonoBehaviour
         return newPos;
     }
 
-    private bool IsInGrid(int x, int y)
+    private bool IsInGrid(int x, int y, LevelGridSO levelGridSO)
     {
         if (x < 0 || y < 0) return false;
-        if (x >= widthSize || y >= heightSize) return false;
+        if (x >= levelGridSO.WidthSize || y >= levelGridSO.HeighSize) return false;
         return true;
     }
 }
