@@ -479,6 +479,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d29324ce3ed8be944a6fcf048dad7a63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  audioMixer: {fileID: 0}
 --- !u!1 &35451963
 GameObject:
   m_ObjectHideFlags: 0
@@ -1044,6 +1045,7 @@ GameObject:
   - component: {fileID: 216501348}
   - component: {fileID: 216501350}
   - component: {fileID: 216501349}
+  - component: {fileID: 216501351}
   m_Layer: 0
   m_Name: ExitText
   m_TagString: Untagged
@@ -1167,6 +1169,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 216501347}
   m_CullTransparentMesh: 1
+--- !u!114 &216501351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 216501347}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a125a8b0e22428f43b79edada2a83724, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: Exit
 --- !u!1 &241723929
 GameObject:
   m_ObjectHideFlags: 0
@@ -1619,7 +1634,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Vietnamese
+  m_text: VN
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
@@ -2702,6 +2717,7 @@ GameObject:
   - component: {fileID: 1005955888}
   - component: {fileID: 1005955890}
   - component: {fileID: 1005955889}
+  - component: {fileID: 1005955891}
   m_Layer: 0
   m_Name: PlayText
   m_TagString: Untagged
@@ -2825,6 +2841,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1005955887}
   m_CullTransparentMesh: 1
+--- !u!114 &1005955891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1005955887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a125a8b0e22428f43b79edada2a83724, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: Play
 --- !u!1 &1016112152
 GameObject:
   m_ObjectHideFlags: 0
@@ -3227,6 +3256,50 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!1 &1230912590
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1230912592}
+  - component: {fileID: 1230912591}
+  m_Layer: 0
+  m_Name: Localization
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1230912591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1230912590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04c260a1a8cc88744867309c2c1ad764, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1230912592
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1230912590}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 896, y: 414, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1234804191
 GameObject:
   m_ObjectHideFlags: 0
@@ -3455,7 +3528,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 2.9385796, y: 0.0000038146973}
+  m_AnchoredPosition: {x: 2.9385796, y: 0.000011444092}
   m_SizeDelta: {x: -3.91695, y: 18.53951}
   m_Pivot: {x: 0.14, y: 1}
 --- !u!1 &1501667354
@@ -3469,6 +3542,7 @@ GameObject:
   - component: {fileID: 1501667355}
   - component: {fileID: 1501667357}
   - component: {fileID: 1501667356}
+  - component: {fileID: 1501667358}
   m_Layer: 0
   m_Name: CreditText
   m_TagString: Untagged
@@ -3592,6 +3666,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1501667354}
   m_CullTransparentMesh: 1
+--- !u!114 &1501667358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1501667354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a125a8b0e22428f43b79edada2a83724, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: Credit
 --- !u!1 &1539505676
 GameObject:
   m_ObjectHideFlags: 0
@@ -4842,6 +4929,7 @@ GameObject:
   - component: {fileID: 1983782771}
   - component: {fileID: 1983782770}
   - component: {fileID: 1983782769}
+  - component: {fileID: 1983782773}
   m_Layer: 0
   m_Name: Dropdown
   m_TagString: Untagged
@@ -4921,18 +5009,18 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
-    - m_Text: Vietnamese
-      m_Image: {fileID: 21300018, guid: 1eaee135ce037439d925cee5e41ce026, type: 3}
-    - m_Text: Korean
+    - m_Text: VN
       m_Image: {fileID: 0}
-    - m_Text: English
+    - m_Text: EL
+      m_Image: {fileID: 0}
+    - m_Text: 'KO '
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 8444990}
         m_TargetAssemblyTypeName: SettingController, Assembly-CSharp
-        m_MethodName: ChangeLangue
+        m_MethodName: ChangeLanguage
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4981,6 +5069,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1983782767}
   m_CullTransparentMesh: 1
+--- !u!114 &1983782773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1983782767}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81d3d7c23257ac44ca14f4a3b296d683, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  keys:
+  - English_Display
+  - Vietnamese_Display
+  - Korean_Display
 --- !u!1 &2032736840
 GameObject:
   m_ObjectHideFlags: 0
@@ -5229,3 +5333,4 @@ SceneRoots:
   - {fileID: 87617758}
   - {fileID: 550103329}
   - {fileID: 197462288}
+  - {fileID: 1230912592}
