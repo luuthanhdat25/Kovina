@@ -1,15 +1,15 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class TrayUIContainer : MonoBehaviour
 {
-    [SerializeField] private TrayUI trayUI1;
-    [SerializeField] private TrayUI trayUI2;
-    [SerializeField] private TrayUI trayUI3;
+    [SerializeField] private List<TrayUI> trayUIs = new List<TrayUI>();
+    public List<TrayUI> TrayUIs => trayUIs;
 
-    [SerializeField] private float spacing = 5f; 
-    [SerializeField] private float paddingLeft = 5f; 
+    [SerializeField] private float spacing = 5f;
+    [SerializeField] private float paddingLeft = 5f;
     [SerializeField] private float paddingRight = 5f;
 
     private RectTransform containerRect;
@@ -17,59 +17,83 @@ public class TrayUIContainer : MonoBehaviour
     private void Start()
     {
         containerRect = GetComponent<RectTransform>();
-        StartCoroutine(AdjustTraysUI());
+        StartCoroutine(AdjustAndEnableTraysUI());
     }
 
-    private IEnumerator AdjustTraysUI()
+    private IEnumerator AdjustAndEnableTraysUI()
     {
         yield return new WaitForSeconds(0.1f);
-        AdjustTrayUISizeAndPosition(trayUI1, 0);
-        AdjustTrayUISizeAndPosition(trayUI2, 1);
-        AdjustTrayUISizeAndPosition(trayUI3, 2);
-        OnEnableTraysUI();
+
+        float containerWidth = containerRect.rect.width;
+        float containerHeight = containerRect.rect.height;
+        float availableWidth = containerWidth - paddingLeft - paddingRight;
+        float totalSpacingHeight = (trayUIs.Count - 1) * spacing;
+        float maxHeightPerTray = (containerHeight - totalSpacingHeight) / trayUIs.Count;
+
+        for (int i = 0; i < trayUIs.Count; i++)
+        {
+            AdjustTray(trayUIs[i], i, availableWidth, maxHeightPerTray);
+            EnableTrayUI(trayUIs[i]);
+        }
     }
 
-    public void OnEnableTraysUI()
-    {
-        EnableTrayUI(trayUI1);
-        EnableTrayUI(trayUI2);
-        EnableTrayUI(trayUI3);
-    }
-
-    private void AdjustTrayUISizeAndPosition(TrayUI trayUI, int index)
+    private void AdjustTray(TrayUI trayUI, int index, float availableWidth, float maxHeightPerTray)
     {
         Image trayImage = trayUI.GetComponent<Image>();
         Sprite traySprite = trayImage.sprite;
 
-        float widthTraySprite = traySprite.texture.width;
-        float heightTraySprite = traySprite.texture.height;
-        float ratioTraySprite = (float)widthTraySprite / heightTraySprite;
-
-        RectTransform trayRectTransform = trayUI.GetComponent<RectTransform>();
-        float containerWidth = containerRect.rect.width;
-        float containerHeight = containerRect.rect.height;
-
-        float availableWidth = containerWidth - paddingLeft - paddingRight;
-        float newWidth = availableWidth;
-        float newHeight = newWidth / ratioTraySprite;
-
-        if (newHeight > (containerHeight - 2 * spacing) / 3)
+        if (traySprite == null)
         {
-            newHeight = (containerHeight - 2 * spacing) / 3;
-            newWidth = newHeight * ratioTraySprite;
+            Debug.LogWarning("[TrayUIContainer] Tray sprite is null.");
+            return;
         }
 
-        trayRectTransform.sizeDelta = new Vector2(newWidth, newHeight);
+        float spriteWidth = traySprite.texture.width;
+        float spriteHeight = traySprite.texture.height;
+        float spriteAspectRatio = (float)spriteWidth / spriteHeight;
 
-        float totalHeight = 3 * newHeight + 2 * spacing;
-        float startY = totalHeight / 2 - newHeight / 2;
+        float newWidth = availableWidth;
+        float newHeight = newWidth / spriteAspectRatio;
+
+        if (newHeight > maxHeightPerTray)
+        {
+            newHeight = maxHeightPerTray;
+            newWidth = newHeight * spriteAspectRatio;
+        }
+
+        RectTransform trayRect = trayUI.GetComponent<RectTransform>();
+        trayRect.sizeDelta = new Vector2(newWidth, newHeight);
+
+        float totalHeight = trayUIs.Count * newHeight + (trayUIs.Count - 1) * spacing;
+        float startY = totalHeight / (trayUIs.Count - 1) - newHeight / (trayUIs.Count - 1);
         float yOffset = startY - index * (newHeight + spacing);
-        trayRectTransform.anchoredPosition = new Vector2((paddingLeft - paddingRight) / 2, yOffset);
+        trayRect.anchoredPosition = new Vector2(paddingLeft, yOffset);
+    }
+
+    public void OnEnableTraysUI()
+    {
+        foreach (TrayUI trayUI in trayUIs)
+        {
+            EnableTrayUI(trayUI);
+        }
     }
 
     private void EnableTrayUI(TrayUI trayUI)
     {
         trayUI.gameObject.SetActive(true);
         trayUI.EnableScaleAnimation();
+    }
+
+    public void SetItemImageForTrayUI(List<ItemType> itemTypes, int index)
+    {
+        if (index >= 0 && index < trayUIs.Count)
+        {
+            TrayUI trayUI = trayUIs[index];
+            trayUI.SetItemImages(itemTypes);
+        }
+        else
+        {
+            Debug.LogWarning($"[TrayUIContainer] Invalid index: {index}. TrayUI not found.");
+        }
     }
 }

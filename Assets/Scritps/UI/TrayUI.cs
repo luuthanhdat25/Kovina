@@ -11,6 +11,7 @@ public class TrayUI : DraggableUI
     
     [SerializeField] private RectTransform rectTransformParent;
     [SerializeField] private RectTransform pointCenter;
+    [SerializeField] private List<Image> imageImages = new List<Image>();
 
     private int id;
     private Vector3 startPosition;
@@ -22,6 +23,15 @@ public class TrayUI : DraggableUI
         id = transform.GetSiblingIndex();
         pointCenterPosition = pointCenter.anchoredPosition;
         startPosition = rectTransform.anchoredPosition;
+    }
+
+    public void SetItemImages(List<ItemType> itemTypes)
+    {
+        var itemSprites = ItemTraditionalManager.Instance.Spawner.GetSpritesForItems(itemTypes);
+        for (int i = 0; i < imageImages.Count; i++)
+        {
+            imageImages[i].sprite = itemSprites[i];
+        }
     }
 
     public override void OnBeginDrag(PointerEventData eventData)
