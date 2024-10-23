@@ -31,6 +31,16 @@ public class MainGrid : MonoBehaviour
 
     void Start()
     {
+        LoadLevel loadLevel = LoadLevel.Instance;
+        if (loadLevel != null)
+        {
+            levelNumber = loadLevel.Level;
+        }
+        else
+        {
+            levelNumber = 1;
+        }
+
         LevelGridSO levelGridData = Resources.Load<LevelGridSO>(levelLoadPath + levelNumber);
         if(levelGridData != null)
         {
@@ -106,6 +116,10 @@ public class MainGrid : MonoBehaviour
                     }
                     cell.SetContainObjectTrue();
                 }
+            }
+            else
+            {
+                Debug.LogError($"{box.Type} at coordinate: {box.XPosition},{box.YPosition} is out of Grid!");
             }
         }
     }

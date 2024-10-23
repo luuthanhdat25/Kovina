@@ -859,6 +859,10 @@ PrefabInstance:
       propertyPath: centerRect
       value: 
       objectReference: {fileID: 754509186}
+    - target: {fileID: 3015813342305005894, guid: 01796113252d5304e82aa64e2476ffcf, type: 3}
+      propertyPath: levelNumber
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 4364429347257405782, guid: 01796113252d5304e82aa64e2476ffcf, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

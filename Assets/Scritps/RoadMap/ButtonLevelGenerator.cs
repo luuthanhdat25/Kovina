@@ -51,6 +51,7 @@ public class ButtonLevelGenerator : MonoBehaviour
             newButton.AddButtonAction(() =>
             {
                 Debug.Log("Play Level: " + levelNumber);
+                LoadLevel.Instance.Load(levelNumber);
             });
         }
     }
