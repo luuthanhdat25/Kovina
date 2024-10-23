@@ -31,6 +31,11 @@ public class Cell : MonoBehaviour
         isContainObject = true;
     }
 
+    public void SetContainObjectFalse()
+    {
+        isContainObject = false;
+    }
+
     public Vector2 GetPosition() => transform.position;
 
     public Vector2 GetScale() => transform.localScale;
