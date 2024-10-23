@@ -6,13 +6,17 @@ public class Tray : MonoBehaviour
 {
     private readonly float Z_COORDINATE_MOVE = -1f;
 
+    [SerializeField] private List<Transform> points;
     private int id;
+
+    public List<Transform> Points => points;
+    public int Id => id;
+ 
     private Vector3 positionStart = Vector3.zero;
 
-    private List<Cell> cellInteractList = new List<Cell>();
     private Cell activeCell;
 
-    public int Id => id;
+    private List<Cell> cellInteractList = new List<Cell>();
     
     public void Init(int id)
     {

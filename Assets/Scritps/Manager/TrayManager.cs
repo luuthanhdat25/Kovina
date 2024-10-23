@@ -1,13 +1,19 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class TrayManager : Singleton<TrayManager>
 {
+    private readonly Vector3 TRAY_START_POSITION = new Vector3(1000, 0, 0);
+    private readonly int TRAY_UI_MAXIMUM = 3;
+
     [Header("Components"), Space(6)]
     [SerializeField] private Transform trayPrefab;
     [SerializeField] private Transform trayHolder;
     [SerializeField] private TrayUIContainer trayUIContainer;
+
+    public static event Action OnEnoughTrayPlaced;
 
     private List<Tray> trayUnplaced = new List<Tray>();
     private List<Tray> trayPlaced = new List<Tray>();
@@ -15,27 +21,70 @@ public class TrayManager : Singleton<TrayManager>
 
     private int countTrayPlaced = 0;
 
-    private void Start()
+    private void Start() => SpawnUnplacedTraies();
+
+    private void OnEnable() => RegisterListenEvent_EnoughTrayPlaced();
+    private void OnDisable() => UnregisterListenEvent_EnoughTrayPlaced();
+    
+    private void RegisterListenEvent_EnoughTrayPlaced()
     {
-        CreateUnplacedTray(0, new Vector3(1000, 0, 0)).gameObject.SetActive(false);
-        CreateUnplacedTray(1, new Vector3(1000, 0, 0)).gameObject.SetActive(false);
-        CreateUnplacedTray(2, new Vector3(1000, 0, 0)).gameObject.SetActive(false);
+        Debug.Log("[TrayManager] RegisterListenEvent_EnoughTrayPlaced: | SUCCESS |");
+        OnEnoughTrayPlaced += MoveToTrayPlaces;
+        OnEnoughTrayPlaced += SpawnUnplacedTraies;
+    }
+
+    private void UnregisterListenEvent_EnoughTrayPlaced()
+    {
+        Debug.Log("[TrayManager] UnregisterListenEvent_EnoughTrayPlaced: | SUCCESS |");
+        OnEnoughTrayPlaced -= MoveToTrayPlaces;
+        OnEnoughTrayPlaced -= SpawnUnplacedTraies;
     }
 
     public void OnTrayPlaced()
     {
         countTrayPlaced = countTrayPlaced + 1;
-        if (countTrayPlaced >= 3)
+        if (countTrayPlaced >= TRAY_UI_MAXIMUM)
         {
             countTrayPlaced = 0;
-            for (int i = 0; i < trayUnplaced.Count; i++)
-                trayPlaced.Add(trayUnplaced[i]);
-
-            trayUnplaced.Clear();
-            for (int i = 0; i < 3; i++)
-                CreateUnplacedTray(i, new Vector3(1000, 0, 0)).gameObject.SetActive(false);
+            OnEnoughTrayPlaced?.Invoke();
             trayUIContainer.OnEnableTraysUI();
         }
+    }
+
+    private void SpawnUnplacedTraies()
+    {
+        trayUnplaced.Clear();
+        for (int i = 0; i < TRAY_UI_MAXIMUM; i++)
+        {
+            Debug.Log($"[TrayManager] OnTrayPlaced: {i}");
+            Tray trayComponent = CreateUnplacedTray(i, TRAY_START_POSITION);
+            trayComponent.gameObject.SetActive(false);
+            CreateItemOnTray(trayComponent, i);
+        }
+    }
+
+    private void MoveToTrayPlaces()
+    {
+        for (int i = 0; i < trayUnplaced.Count; i++)
+            trayPlaced.Add(trayUnplaced[i]);
+    }
+
+    private void CreateItemOnTray(Tray trayComponent, int index)
+    {
+        var points = trayComponent.Points;
+        var itemTypes = new List<ItemType>();
+
+        foreach (Transform point in points)
+        {
+            var itemType = ItemTraditionalManager.Instance.Spawner.GetRandomEnumValue();
+            var item = ItemTraditionalManager.Instance.Spawner.Spawn(itemType);
+
+            item.transform.SetParent(trayComponent.transform);
+            item.transform.position = point.position;
+            item.transform.localScale = point.localScale;
+            itemTypes.Add(itemType);
+        }
+        trayUIContainer.SetItemImageForTrayUI(itemTypes, index);
     }
 
     #region CRUD
@@ -88,7 +137,6 @@ public class TrayManager : Singleton<TrayManager>
 
         Tray trayComponent = trayUnplaced[index];
         trayPlaced.Add(trayComponent);
-        //trayUnplaced.Remove(trayComponent);
         Debug.Log($"TrayManager: add {trayComponent} element to trayPlaced |SUCCESS|");
     }
 
