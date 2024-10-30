@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class TrayManager : Singleton<TrayManager>
@@ -40,7 +41,7 @@ public class TrayManager : Singleton<TrayManager>
         OnEnoughTrayPlaced -= SpawnUnplacedTraies;
     }
 
-    public void OnTrayPlaced()
+    public void OnTrayPlaced(Tray trayComponent, Cell cellPlaced)
     {
         countTrayPlaced = countTrayPlaced + 1;
         if (countTrayPlaced >= TRAY_UI_MAXIMUM)
@@ -49,7 +50,143 @@ public class TrayManager : Singleton<TrayManager>
             OnEnoughTrayPlaced?.Invoke();
             trayUIContainer.OnEnableTraysUI();
         }
+
+        Debug.Log($"Placed Tray {trayComponent.name} in {cellPlaced.name}");
+        Tray trayCenter;
+        if(cellPlaced.GetContainObject() is Tray tray)
+        {
+            trayCenter = tray;
+        }
+        else return;
+
+        // Do Algorithm
+        List<Cell> cellsHoriList = MainGrid.Instance.GetCellsHorizontal(cellPlaced);
+        List<Cell> cellsVertiList = MainGrid.Instance.GetCellsVertical(cellPlaced);
+        if (cellsHoriList.Count == 0 && cellsVertiList.Count == 0) return; 
+
+        //Interact with Tray
+        List<Tray> trayHoriList = GetTrayListFromCellList(cellsHoriList);
+        List<Tray> trayVertiList = GetTrayListFromCellList(cellsVertiList);
+        Debug.Log($"Tray [hori: {trayHoriList.Count}, verti: {trayVertiList.Count}]");
+        if (trayHoriList.Count == 0 && trayVertiList.Count == 0) return; 
+        
+        // Horizotal First
+        List<ItemTraditional> itemHoriList = new List<ItemTraditional>();
+        trayHoriList.ForEach(tray => itemHoriList.AddRange(tray.GetItemTraditionalsList()));
+        if (IsTrayHaveOneOfRequireItems(trayCenter, itemHoriList))
+        {
+            //Sort
+            if(trayHoriList.Count == 1)
+            {
+                List<ItemTraditional> trayCenterItemList = trayCenter.GetItemTraditionalsList();
+                int numberOfItemInTrayCenter = trayCenterItemList.Count;
+                if(numberOfItemInTrayCenter == 1)
+                {
+                    if(itemHoriList.Count < 3)
+                    {
+                        var itemMove = trayCenterItemList[0];
+                        trayHoriList[0].AddItem(itemMove);
+                        trayCenter.RemoveItem(itemMove);
+                        trayHoriList[0].ShortAndMoveItemToPosition();
+                        cellPlaced.ClearContainObject();
+                        //Despawn Tray
+                        trayCenter.Despawn(); 
+                    }
+                    else
+                    {
+                        int numberOfEqualItem = itemHoriList.Count(item => item.ItemType == trayCenterItemList[0].ItemType);
+                        if(numberOfEqualItem == 1)
+                        {
+                            var itemMove = itemHoriList.FirstOrDefault(item => item.ItemType == trayCenterItemList[0].ItemType);
+                            trayCenter.AddItem(itemMove);
+                            trayHoriList[0].RemoveItem(itemMove);
+                            
+                            trayHoriList[0].ShortAndMoveItemToPosition();
+                            trayCenter.ShortAndMoveItemToPosition();
+                        }
+                        else // numberOfEqualItem == 2 
+                        {
+                            var itemMoveToCenter = itemHoriList.FirstOrDefault(item => item.ItemType != trayCenterItemList[0].ItemType);
+                            trayHoriList[0].RemoveItem(itemMoveToCenter);
+                            var itemInTrayCenter = trayCenterItemList[0];
+                            trayCenter.RemoveItem(itemInTrayCenter);
+
+                            trayHoriList[0].AddItem(itemInTrayCenter);
+                            trayCenter.AddItem(itemMoveToCenter);
+
+                            trayCenter.ShortAndMoveItemToPosition();
+                            trayHoriList[0].ShortAndMoveItemToPosition();
+
+                            trayHoriList[0].CompletedAndDespawn();
+                        }
+                    }
+                }
+                else if(numberOfItemInTrayCenter == 2)
+                {
+                    
+                }
+                else
+                {
+
+                }
+            }
+            else // 2 Tray
+            {
+
+            }
+        }
+
+        /*List<ItemTraditional> itemVerticalList = new List<ItemTraditional>();
+        trayVerticalList.ForEach(tray => itemVerticalList.AddRange(tray.GetItemTraditionalsList()));
+
+        if(!IsTrayHaveOneOfRequireItems(trayCenter, itemHorizontalList) && !IsTrayHaveOneOfRequireItems(trayCenter,itemVerticalList ))
+        {
+            Debug.Log("Can't match!");
+            return;
+        }*/
+
+
+        /*itemTraditionals.AddRange(trayCenter.GetItemTraditionalsList());
+        if (trayVerticalList.Count == 0)
+        {
+            itemTraditionals.Sort((a, b) => a.ItemType.CompareTo(b.ItemType));
+            string r = "[TrayManager] Debug List Item =>[";
+            foreach (var item in itemTraditionals)
+            {
+                r += item.ItemType.ToString() + "-";
+            }
+            Debug.Log(r + "]");
+        }*/
+
     }
+
+
+
+    private List<Tray> GetTrayListFromCellList(List<Cell> cellList)
+    {
+        List<Tray> trayList = new List<Tray>();
+        if (cellList == null || cellList.Count == 0) return trayList;
+        foreach (var cell in cellList)
+        {
+            if (cell.GetContainObject() is Tray tray)
+            {
+                trayList.Add(tray);
+            }
+        }
+        return trayList;
+    }
+
+    private bool IsTrayHaveOneOfRequireItems(Tray tray, List<ItemTraditional> requireItems)
+    {
+        foreach (var item in tray.GetItemTraditionalsList())
+        {
+            var existItem = requireItems.FirstOrDefault(reItem => reItem.ItemType == item.ItemType);
+            if (existItem != null) return true;
+        }
+        return false;
+    }
+
+
 
     private void SpawnUnplacedTraies()
     {
@@ -73,15 +210,19 @@ public class TrayManager : Singleton<TrayManager>
     {
         var points = trayComponent.Points;
         var itemTypes = new List<ItemType>();
+        trayComponent.ClearItemTraditionalList();
+        //int numberOffItemOnTray = UnityEngine.Random.Range(1, points.Count + 1); // Random number of item on Tray
+        int numberOffItemOnTray = UnityEngine.Random.Range(1, 3); // Random number of item on Tray
 
-        foreach (Transform point in points)
+        for (int i = 0; numberOffItemOnTray > 0; i++, numberOffItemOnTray--)
         {
             var itemType = ItemTraditionalManager.Instance.Spawner.GetRandomEnumValue();
             var item = ItemTraditionalManager.Instance.Spawner.Spawn(itemType);
 
+            trayComponent.AddItem(item);
             item.transform.SetParent(trayComponent.transform);
-            item.transform.position = point.position;
-            item.transform.localScale = point.localScale;
+            item.transform.position = points[i].position;
+            item.transform.localScale = points[i].localScale;
             itemTypes.Add(itemType);
         }
         trayUIContainer.SetItemImageForTrayUI(itemTypes, index);

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tray : MonoBehaviour
+public class Tray : MonoBehaviour, IObject
 {
     private readonly float Z_COORDINATE_MOVE = -1f;
 
@@ -17,12 +17,49 @@ public class Tray : MonoBehaviour
     private Cell activeCell;
 
     private List<Cell> cellInteractList = new List<Cell>();
+
+    private List<ItemTraditional> itemTraditionalList = new List<ItemTraditional>();
     
     public void Init(int id)
     {
         this.id = id;
         positionStart = transform.position;
     }
+
+    public void AddItem(ItemTraditional item)
+    {
+        if (item == null) return;
+        itemTraditionalList.Add(item);
+        item.transform.SetParent(this.transform);
+    }
+
+    public void ShortAndMoveItemToPosition()
+    {
+        itemTraditionalList.Sort((a, b) => a.ItemType.CompareTo(b.ItemType));
+        for (int i = 0; i < itemTraditionalList.Count; i++)
+        {
+            MoveItemToPosition(itemTraditionalList[i], points[i]);
+        }
+    }
+
+    private void MoveItemToPosition(ItemTraditional item, Transform pointPoisiton)
+    {
+        item.transform.position = pointPoisiton.position;
+    }
+
+    public void ClearItemTraditionalList()
+    {
+        this.itemTraditionalList.Clear();
+    }
+
+    public void RemoveItem(ItemTraditional item)
+    {
+        if (item == null) return;
+        if (!itemTraditionalList.Contains(item)) return;
+        itemTraditionalList.Remove(item);
+    }
+
+    public List<ItemTraditional> GetItemTraditionalsList() => itemTraditionalList;
 
     public void ResetCoordinate()
     {
@@ -36,19 +73,21 @@ public class Tray : MonoBehaviour
         return mousePosition;
     }
 
-    public bool SetPlaceInCell()
+    public (bool, Cell) SetPlaceInCell()
     {
         if (activeCell != null)
         {
             transform.position = activeCell.transform.position;
             activeCell.UnActiveSelectVisual();
-            activeCell.SetContainObjectTrue();
+            activeCell.SetContainObject(this);
+
+            Cell cellPlace = activeCell;
             activeCell = null;
 
             cellInteractList.Clear();
-            return true;
+            return (true, cellPlace);
         }
-        return false;
+        return (false, null);
     }
 
     public void SetPositionFollowUserInput()
@@ -91,10 +130,11 @@ public class Tray : MonoBehaviour
         return targetCell;
     }
 
+    #region Tray Interact to Cell
     private void OnTriggerEnter2D(Collider2D collision)
     {
         Cell cell = collision.gameObject.GetComponent<Cell>();
-        if (cell != null && !cellInteractList.Contains(cell) && !cell.IsContainObject)
+        if (cell != null && !cellInteractList.Contains(cell) && !cell.IsContainObject())
         {
             cellInteractList.Add(cell);
         }
@@ -122,4 +162,22 @@ public class Tray : MonoBehaviour
             }
         }
     }
+
+    #endregion
+    public void DoAction()
+    {
+        return;
+    }
+
+    public void Despawn()
+    {
+        Invoke("DestroySelf", 0.5f);
+    }
+
+    public void CompletedAndDespawn()
+    {
+        Invoke("DestroySelf", 0.5f);
+    }
+
+    private void DestroySelf() => Destroy(gameObject);
 }

@@ -12,9 +12,9 @@ public class LevelGridSO : ScriptableObject
 
     [Space]
     [SerializeField]
-    private Box[] boxSetUps;
+    private BoxSetUp[] boxSetUps;
 
     public int WidthSize => widthSize;
     public int HeighSize => heightSize;
-    public Box[] BoxSetups => boxSetUps;
+    public BoxSetUp[] BoxSetups => boxSetUps;
 }

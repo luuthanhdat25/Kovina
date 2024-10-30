@@ -5,7 +5,7 @@ public enum BoxType
 }
 
 [System.Serializable]
-public struct Box
+public struct BoxSetUp
 {
     public BoxType Type;
     public int XPosition;

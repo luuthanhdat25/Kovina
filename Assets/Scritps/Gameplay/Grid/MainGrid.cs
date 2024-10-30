@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
-public class MainGrid : MonoBehaviour
+public class MainGrid : Singleton<MainGrid>
 {
     [SerializeField]
     private Cell cellPrefab;
@@ -28,13 +29,15 @@ public class MainGrid : MonoBehaviour
     private ExplosiveBox explosiveBoxPrefab;
 
     private Cell[,] cellArray;
+    private int widthSize;
+    private int heightSize;
 
     void Start()
     {
         LoadLevel loadLevel = LoadLevel.Instance;
         if (loadLevel != null)
         {
-            levelNumber = loadLevel.Level;
+            levelNumber = loadLevel.Level <= 0 ? 1 : loadLevel.Level;
         }
         else
         {
@@ -61,8 +64,8 @@ public class MainGrid : MonoBehaviour
 
     private void InitialCells(LevelGridSO levelGridSO)
     {
-        int widthSize = levelGridSO.WidthSize;
-        int heightSize = levelGridSO.HeighSize;
+        widthSize = levelGridSO.WidthSize;
+        heightSize = levelGridSO.HeighSize;
 
         cellArray = new Cell[widthSize, heightSize];
         Vector2 cellScale = cellPrefab.GetScale();
@@ -96,25 +99,28 @@ public class MainGrid : MonoBehaviour
     {
         foreach (var box in levelGridSO.BoxSetups)
         {
-            if (IsInGrid(box.XPosition, box.YPosition, levelGridSO))
+            if (IsInGrid(box.XPosition, box.YPosition))
             {
                 Cell cell = cellArray[box.XPosition, box.YPosition];
-                if (!cell.IsContainObject)
+                if (!cell.IsContainObject())
                 {
+                    IObject iObject = null;
                     switch (box.Type)
                     {
                         case BoxType.QuestionBox:
                             QuestionBox questionBox = Instantiate(questionBoxPrefab, transform);
+                            iObject = questionBox;
                             questionBox.transform.position = cellArray[box.XPosition, box.YPosition].transform.position;
                             break;
 
                         case BoxType.ExplosiveBox:
                             ExplosiveBox explosiveBox = Instantiate(explosiveBoxPrefab, transform);
+                            iObject = explosiveBox;
                             explosiveBox.transform.position = cellArray[box.XPosition, box.YPosition].transform.position;
                             explosiveBox.SetCellPlace(cell);
                             break;
                     }
-                    cell.SetContainObjectTrue();
+                    cell.SetContainObject(iObject);
                 }
             }
             else
@@ -130,10 +136,63 @@ public class MainGrid : MonoBehaviour
         return newPos;
     }
 
-    private bool IsInGrid(int x, int y, LevelGridSO levelGridSO)
+    private bool IsInGrid(int x, int y)
     {
         if (x < 0 || y < 0) return false;
-        if (x >= levelGridSO.WidthSize || y >= levelGridSO.HeighSize) return false;
+        if (x >= widthSize || y >= heightSize) return false;
         return true;
+    }
+
+    public List<Cell> GetCellsHorizontal(Cell centerCell)
+    {
+        List<Cell> cellList = new List<Cell>();
+
+        (int x, int y) = GetCellCoordinates(centerCell);
+
+        if (x == -1 || y == -1)
+        {
+            Debug.LogError("[MainGrid] Center cell is not part of the grid.");
+            return cellList;
+        }
+
+        if (IsInGrid(x - 1, y)) cellList.Add(cellArray[x - 1, y]);
+        //cellList.Add(centerCell);
+        if (IsInGrid(x + 1, y)) cellList.Add(cellArray[x + 1, y]);
+        return cellList;
+    }
+
+    public List<Cell> GetCellsVertical(Cell centerCell)
+    {
+        List<Cell> cellList = new List<Cell>();
+
+        (int x, int y) = GetCellCoordinates(centerCell);
+
+        if (x == -1 || y == -1)
+        {
+            Debug.LogError("[MainGrid] Center cell is not part of the grid.");
+            return cellList;
+        }
+
+        if (IsInGrid(x, y + 1)) cellList.Add(cellArray[x, y + 1]);
+        //cellList.Add(centerCell);
+        if (IsInGrid(x, y - 1)) cellList.Add(cellArray[x, y - 1]);
+        return cellList;
+    }
+
+
+    public (int, int) GetCellCoordinates(Cell targetCell)
+    {
+        for (int x = 0; x < widthSize; x++)
+        {
+            for (int y = 0; y < heightSize; y++)
+            {
+                if (cellArray[x, y] == targetCell)
+                {
+                    return (x, y);
+                }
+            }
+        }
+
+        return (-1, -1);
     }
 }
