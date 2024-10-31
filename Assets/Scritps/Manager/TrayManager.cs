@@ -26,7 +26,7 @@ public class TrayManager : Singleton<TrayManager>
 
     private void OnEnable() => RegisterListenEvent_EnoughTrayPlaced();
     private void OnDisable() => UnregisterListenEvent_EnoughTrayPlaced();
-    
+
     private void RegisterListenEvent_EnoughTrayPlaced()
     {
         Debug.Log("[TrayManager] RegisterListenEvent_EnoughTrayPlaced: | SUCCESS |");
@@ -53,7 +53,7 @@ public class TrayManager : Singleton<TrayManager>
 
         Debug.Log($"Placed Tray {trayComponent.name} in {cellPlaced.name}");
         Tray trayCenter;
-        if(cellPlaced.GetContainObject() is Tray tray)
+        if (cellPlaced.GetContainObject() is Tray tray)
         {
             trayCenter = tray;
         }
@@ -62,7 +62,7 @@ public class TrayManager : Singleton<TrayManager>
         // Do Algorithm
         List<Cell> cellsHoriList = MainGrid.Instance.GetCellsHorizontal(cellPlaced);
         List<Cell> cellsVertiList = MainGrid.Instance.GetCellsVertical(cellPlaced);
-        if (cellsHoriList.Count == 0 && cellsVertiList.Count == 0) return; 
+        if (cellsHoriList.Count == 0 && cellsVertiList.Count == 0) return;
 
         //Interact with Tray
         List<Tray> trayHoriList = GetTrayListFromCellList(cellsHoriList);
@@ -94,7 +94,7 @@ public class TrayManager : Singleton<TrayManager>
             trayInteract.ShortAndMoveItemToPositionOrDespawn();
             trayCenter.ShortAndMoveItemToPositionOrDespawn();
         }
-        else if((trayHoriList.Count == 0 && trayVertiList.Count > 1) || (trayHoriList.Count > 1 && trayVertiList.Count == 0)) //3 tray (Hori or Verti) 
+        else if ((trayHoriList.Count == 0 && trayVertiList.Count > 1) || (trayHoriList.Count > 1 && trayVertiList.Count == 0)) //3 tray (Hori or Verti) 
         {
             trayHoriList.AddRange(trayVertiList);
         }
@@ -110,7 +110,7 @@ public class TrayManager : Singleton<TrayManager>
         itemList.AddRange(itemTrayCenterList);
         itemList.AddRange(itemTrayAroundList);
 
-        
+
     }
 
     private void Match2Tray(Tray tray1, Tray tray2)
@@ -125,15 +125,15 @@ public class TrayManager : Singleton<TrayManager>
         (ItemType itemTypeMostFrequence, int countFrequence) = GetMostFrequentItemType(itemList);
         Debug.Log($"Most frequence Item: {itemTypeMostFrequence.ToString()}, {countFrequence}");
 
-        if(countFrequence >= 3)
+        if (countFrequence >= 3)
         {
             int count = 0;
             foreach (var item in tray2ItemList)
             {
                 if (item.ItemType == itemTypeMostFrequence) count++;
             }
-            Tray trayHave2Item = count == 2? tray2: tray1;
-            Tray trayHave1Item = trayHave2Item == tray2? tray1: tray2;
+            Tray trayHave2Item = count == 2 ? tray2 : tray1;
+            Tray trayHave1Item = trayHave2Item == tray2 ? tray1 : tray2;
             ItemTraditional itemMoveToMatch = trayHave1Item.GetItemTraditionalsList().FirstOrDefault(item => item.ItemType == itemTypeMostFrequence);
             ItemTraditional itemMoveToOther = trayHave2Item.GetItemTraditionalsList().FirstOrDefault(item => item.ItemType != itemTypeMostFrequence);
 
@@ -159,21 +159,21 @@ public class TrayManager : Singleton<TrayManager>
             }
             (ItemType itemTypeSecondFrequence, int countFrequence2) = GetMostFrequentItemType(itemListOther);
 
-            if(countFrequence2 == 2)
+            if (countFrequence2 == 2)
             {
                 ItemTraditional itemOther2 = itemListOther.FirstOrDefault(item => item.ItemType != itemTypeSecondFrequence);
-                if(itemOther2 != null) itemListFrequence.Add(itemOther2);
+                if (itemOther2 != null) itemListFrequence.Add(itemOther2);
             }
             else
             {
-                if(itemListOther.Count > 3)
+                if (itemListOther.Count > 3)
                 {
                     ItemTraditional itemOther2 = itemListOther.FirstOrDefault();
                     itemListFrequence.Add(itemOther2);
                 }
             }
 
-            if(tray1ItemList.Count == 1)
+            if (tray1ItemList.Count == 1)
             {
                 tray1.ClearItemTraditionalList();
                 tray2.ClearItemTraditionalList();
@@ -185,7 +185,7 @@ public class TrayManager : Singleton<TrayManager>
                 tray1.ClearItemTraditionalList();
                 tray2.ClearItemTraditionalList();
                 tray2.AddRangeItem(itemListFrequence);
-                tray1.AddRangeItem(itemListOther); 
+                tray1.AddRangeItem(itemListOther);
             }
         }
     }
@@ -237,7 +237,7 @@ public class TrayManager : Singleton<TrayManager>
 
     private bool IsTrayMatchWithTrayList(Tray trayCheck, List<Tray> trayList)
     {
-        if(trayList.Count == 0) return false;
+        if (trayList.Count == 0) return false;
         List<ItemTraditional> itemHoriList = new List<ItemTraditional>();
         trayList.ForEach(tray => itemHoriList.AddRange(tray.GetItemTraditionalsList()));
 
@@ -329,7 +329,7 @@ public class TrayManager : Singleton<TrayManager>
             Debug.Log("TrayManager: trayUnplaced has not been initialized. Initializing now...");
             trayUnplaced = new List<Tray>();
         }
-        
+
         trayUnplaced.Add(trayComponent);
         Debug.Log($"TrayManager: add {trayComponent} element to trayUnplaced |SUCCESS|");
     }

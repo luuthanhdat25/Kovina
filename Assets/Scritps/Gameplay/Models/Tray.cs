@@ -46,7 +46,7 @@ public class Tray : MonoBehaviour, IObject
             for (int i = 0; i < itemTraditionalList.Count; i++)
             {
                 int index = i;
-                if(itemTraditionalList[index] == null)
+                if (itemTraditionalList[index] == null)
                 {
                     itemTraditionalList.Remove(itemTraditionalList[index]);
                 }
