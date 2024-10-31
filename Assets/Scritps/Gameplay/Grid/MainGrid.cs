@@ -1,16 +1,16 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
-public class MainGrid : MonoBehaviour
+public class MainGrid : Singleton<MainGrid>
 {
     [SerializeField]
     private Cell cellPrefab;
 
-    [Header("[Cell size]")]
     [SerializeField]
-    private int widthSize;
+    private string levelLoadPath = "Level/Level_Grid_";
 
     [SerializeField]
-    private int heightSize;
+    private int levelNumber;
 
     [Header("[Cell Padding]")]
     [SerializeField]
@@ -22,16 +22,52 @@ public class MainGrid : MonoBehaviour
     [SerializeField]
     private RectTransform centerRect;
 
+    [SerializeField]
+    private QuestionBox questionBoxPrefab;
+
+    [SerializeField]
+    private ExplosiveBox explosiveBoxPrefab;
+
     private Cell[,] cellArray;
+    private int widthSize;
+    private int heightSize;
 
     void Start()
     {
-        InitialGrid();
+        LoadLevel loadLevel = LoadLevel.Instance;
+        if (loadLevel != null)
+        {
+            levelNumber = loadLevel.Level <= 0 ? 1 : loadLevel.Level;
+        }
+        else
+        {
+            levelNumber = 1;
+        }
+
+        LevelGridSO levelGridData = Resources.Load<LevelGridSO>(levelLoadPath + levelNumber);
+        if(levelGridData != null)
+        {
+            InitialGrid(levelGridData);
+        }
+        else
+        {
+            Debug.LogWarning("File" + levelLoadPath + levelNumber + " doesn't exist!");
+        }
     }
 
-    private void InitialGrid()
+    private void InitialGrid(LevelGridSO levelGridSO)
     {
-        cellArray = new Cell[heightSize, widthSize];
+        InitialCells(levelGridSO);
+
+        InitialBoxs(levelGridSO);
+    }
+
+    private void InitialCells(LevelGridSO levelGridSO)
+    {
+        widthSize = levelGridSO.WidthSize;
+        heightSize = levelGridSO.HeighSize;
+
+        cellArray = new Cell[widthSize, heightSize];
         Vector2 cellScale = cellPrefab.GetScale();
 
         float gridWidth = (widthSize * cellScale.x) + ((widthSize - 1) * widthPadding);
@@ -42,19 +78,54 @@ public class MainGrid : MonoBehaviour
 
         Vector3 startPos = new Vector2(girdCenterPosition.x - gridWidth / 2, girdCenterPosition.y - gridHeight / 2) + cellScale / 2;
 
-        for (int i = 0; i < heightSize; i++)
+        for (int i = 0; i < widthSize; i++)
         {
-            for (int j = 0; j < widthSize; j++)
+            for (int j = 0; j < heightSize; j++)
             {
                 Cell newCell = Instantiate(cellPrefab);
                 newCell.transform.SetParent(transform);
                 newCell.name = $"Cell {i}, {j}";
 
-                float posX = startPos.x + j * (widthPadding + cellScale.x);
-                float posY = startPos.y + i * (heightPadding + cellScale.y);
+                float posX = startPos.x + i * (widthPadding + cellScale.x);
+                float posY = startPos.y + j * (heightPadding + cellScale.y);
                 newCell.transform.position = new Vector2(posX, posY);
 
                 cellArray[i, j] = newCell;
+            }
+        }
+    }
+
+    private void InitialBoxs(LevelGridSO levelGridSO)
+    {
+        foreach (var box in levelGridSO.BoxSetups)
+        {
+            if (IsInGrid(box.XPosition, box.YPosition))
+            {
+                Cell cell = cellArray[box.XPosition, box.YPosition];
+                if (!cell.IsContainObject())
+                {
+                    IObject iObject = null;
+                    switch (box.Type)
+                    {
+                        case BoxType.QuestionBox:
+                            QuestionBox questionBox = Instantiate(questionBoxPrefab, transform);
+                            iObject = questionBox;
+                            questionBox.transform.position = cellArray[box.XPosition, box.YPosition].transform.position;
+                            break;
+
+                        case BoxType.ExplosiveBox:
+                            ExplosiveBox explosiveBox = Instantiate(explosiveBoxPrefab, transform);
+                            iObject = explosiveBox;
+                            explosiveBox.transform.position = cellArray[box.XPosition, box.YPosition].transform.position;
+                            explosiveBox.SetCellPlace(cell);
+                            break;
+                    }
+                    cell.SetContainObject(iObject);
+                }
+            }
+            else
+            {
+                Debug.LogError($"{box.Type} at coordinate: {box.XPosition},{box.YPosition} is out of Grid!");
             }
         }
     }
@@ -63,5 +134,79 @@ public class MainGrid : MonoBehaviour
     {
         Vector3 newPos = centerRect.position * CameraManager.Instance.ZoomRatio();
         return newPos;
+    }
+
+    private bool IsInGrid(int x, int y)
+    {
+        if (x < 0 || y < 0) return false;
+        if (x >= widthSize || y >= heightSize) return false;
+        return true;
+    }
+
+    public List<Cell> GetCellsHorizontal(Cell centerCell)
+    {
+        List<Cell> cellList = new List<Cell>();
+
+        (int x, int y) = GetCellCoordinates(centerCell);
+
+        if (x == -1 || y == -1)
+        {
+            Debug.LogError("[MainGrid] Center cell is not part of the grid.");
+            return cellList;
+        }
+
+        if (IsInGrid(x - 1, y)) cellList.Add(cellArray[x - 1, y]);
+        //cellList.Add(centerCell);
+        if (IsInGrid(x + 1, y)) cellList.Add(cellArray[x + 1, y]);
+        return cellList;
+    }
+
+    public List<Cell> GetCellsVertical(Cell centerCell)
+    {
+        List<Cell> cellList = new List<Cell>();
+
+        (int x, int y) = GetCellCoordinates(centerCell);
+
+        if (x == -1 || y == -1)
+        {
+            Debug.LogError("[MainGrid] Center cell is not part of the grid.");
+            return cellList;
+        }
+
+        if (IsInGrid(x, y + 1)) cellList.Add(cellArray[x, y + 1]);
+        //cellList.Add(centerCell);
+        if (IsInGrid(x, y - 1)) cellList.Add(cellArray[x, y - 1]);
+        return cellList;
+    }
+
+
+    public (int, int) GetCellCoordinates(Cell targetCell)
+    {
+        for (int x = 0; x < widthSize; x++)
+        {
+            for (int y = 0; y < heightSize; y++)
+            {
+                if (cellArray[x, y] == targetCell)
+                {
+                    return (x, y);
+                }
+            }
+        }
+
+        return (-1, -1);
+    }
+
+    public void ClearTrayInCell(Tray tray)
+    {
+        for (int x = 0; x < widthSize; x++)
+        {
+            for (int y = 0; y < heightSize; y++)
+            {
+                if (cellArray[x, y].GetContainObject() == tray as IObject)
+                {
+                    cellArray[x, y].ClearContainObject();
+                }
+            }
+        }
     }
 }

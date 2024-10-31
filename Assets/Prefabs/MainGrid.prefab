@@ -45,8 +45,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cellPrefab: {fileID: 8462421038750513712, guid: 4e4814206331ffa40b0330e183f2b5d3, type: 3}
-  widthSize: 6
-  heightSize: 6
+  levelNumber: 1
   widthPadding: 0.2
   heightPadding: 0.2
   centerRect: {fileID: 0}
+  questionBoxPrefab: {fileID: 4263596384588504331, guid: 721f57521a3ab984d9e2348d1b62ab14, type: 3}
+  explosiveBoxPrefab: {fileID: 255349386947351872, guid: ec2ec3e42722fc245a49edcae1968d15, type: 3}
