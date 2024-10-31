@@ -100,9 +100,17 @@ public class TrayManager : Singleton<TrayManager>
         }
     }
 
-    private void Match3Tray(Tray trayCenter, Tray trayAroundList)
+    private void Match3Tray(Tray trayCenter, List<Tray> trayAroundList)
     {
+        List<ItemTraditional> itemList = new();
+        var itemTrayCenterList = trayCenter.GetItemTraditionalsList();
+        var itemTrayAroundList = new List<ItemTraditional>();
+        trayAroundList.ForEach(tray => itemTrayAroundList.AddRange(tray.GetItemTraditionalsList()));
 
+        itemList.AddRange(itemTrayCenterList);
+        itemList.AddRange(itemTrayAroundList);
+
+        
     }
 
     private void Match2Tray(Tray tray1, Tray tray2)
