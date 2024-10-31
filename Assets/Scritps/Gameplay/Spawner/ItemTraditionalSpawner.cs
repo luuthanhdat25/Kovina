@@ -35,7 +35,7 @@ public class ItemTraditionalSpawner : ObjectPooling<ItemTraditional, ItemType>
 
     protected override bool CheckMatchValue(ItemType matchType, ItemTraditional component)
     {
-        Debug.Log($"[ItemTraditionalSpawner] CheckMatchValue: {component.ItemType} == {matchType}");
+        //Debug.Log($"[ItemTraditionalSpawner] CheckMatchValue: {component.ItemType} == {matchType}");
         return component.ItemType == matchType;
     }
 }

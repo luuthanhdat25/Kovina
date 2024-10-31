@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEditorInternal.VersionControl;
 using UnityEngine;
 
-public class Tray : MonoBehaviour
+public class Tray : MonoBehaviour, IObject
 {
     private readonly float Z_COORDINATE_MOVE = -1f;
 
@@ -17,12 +19,102 @@ public class Tray : MonoBehaviour
     private Cell activeCell;
 
     private List<Cell> cellInteractList = new List<Cell>();
+
+    private List<ItemTraditional> itemTraditionalList = new List<ItemTraditional>();
     
     public void Init(int id)
     {
         this.id = id;
         positionStart = transform.position;
     }
+
+    public void AddItem(ItemTraditional item)
+    {
+        if (item == null) return;
+        itemTraditionalList.Add(item);
+        item.transform.SetParent(this.transform);
+    }
+
+    public LTSeq ShortAndMoveItemToPositionOrDespawn()
+    {
+        var sequence = LeanTween.sequence();
+
+        if (itemTraditionalList.Count > 0)
+        {
+            itemTraditionalList.Sort((a, b) => a.ItemType.CompareTo(b.ItemType));
+
+            for (int i = 0; i < itemTraditionalList.Count; i++)
+            {
+                int index = i;
+                if (itemTraditionalList[index] == null)
+                {
+                    itemTraditionalList.Remove(itemTraditionalList[index]);
+                }
+                else
+                {
+                    sequence.append(() => MoveItemToPosition(itemTraditionalList[index], points[index]));
+                }
+            }
+            sequence.append(1f);
+            sequence.append(() =>
+            {
+                if (IsMatch3ItemCompleted())
+                {
+                    CompletedAndDespawn();
+                }
+            });
+        }
+        else
+        {
+            sequence.append(.5f);
+            sequence.append(() => Despawn());
+        }
+
+        return sequence;
+    }
+
+
+    private bool IsMatch3ItemCompleted()
+    {
+        if(itemTraditionalList.Count < 3) return false;
+        ItemType itemTypeBase = itemTraditionalList.First().ItemType;
+        for(int i = 1; i< itemTraditionalList.Count; i++)
+        {
+            if (itemTraditionalList[i].ItemType != itemTypeBase) return false;
+        }
+        return true;
+    }
+
+    private void MoveItemToPosition(ItemTraditional item, Transform pointPosition)
+    {
+        LeanTween.move(item.gameObject, pointPosition.position, 0.5f).setEase(LeanTweenType.easeInOutQuad);
+    }
+
+    public void ClearItemTraditionalList()
+    {
+        this.itemTraditionalList.Clear();
+    }
+
+    public void AddRangeItem(List<ItemTraditional> itemList)
+    {
+        foreach (var item in itemList)
+        {
+            if(item != null) 
+            {
+                itemTraditionalList.Add(item);
+                item.transform.SetParent(this.transform);
+            }
+        }
+    }
+
+    public void RemoveItem(ItemTraditional item)
+    {
+        if (item == null) return;
+        if (!itemTraditionalList.Contains(item)) return;
+        itemTraditionalList.Remove(item);
+    }
+
+    public List<ItemTraditional> GetItemTraditionalsList() => itemTraditionalList;
 
     public void ResetCoordinate()
     {
@@ -36,19 +128,21 @@ public class Tray : MonoBehaviour
         return mousePosition;
     }
 
-    public bool SetPlaceInCell()
+    public (bool, Cell) SetPlaceInCell()
     {
         if (activeCell != null)
         {
             transform.position = activeCell.transform.position;
             activeCell.UnActiveSelectVisual();
-            activeCell.SetContainObjectTrue();
+            activeCell.SetContainObject(this);
+
+            Cell cellPlace = activeCell;
             activeCell = null;
 
             cellInteractList.Clear();
-            return true;
+            return (true, cellPlace);
         }
-        return false;
+        return (false, null);
     }
 
     public void SetPositionFollowUserInput()
@@ -91,10 +185,11 @@ public class Tray : MonoBehaviour
         return targetCell;
     }
 
+    #region Tray Interact to Cell
     private void OnTriggerEnter2D(Collider2D collision)
     {
         Cell cell = collision.gameObject.GetComponent<Cell>();
-        if (cell != null && !cellInteractList.Contains(cell) && !cell.IsContainObject)
+        if (cell != null && !cellInteractList.Contains(cell) && !cell.IsContainObject())
         {
             cellInteractList.Add(cell);
         }
@@ -122,4 +217,53 @@ public class Tray : MonoBehaviour
             }
         }
     }
+
+    #endregion
+    public void DoAction()
+    {
+        return;
+    }
+
+    public LTSeq Despawn()
+    {
+        var sequence = LeanTween.sequence();
+
+        sequence.append(
+            LeanTween.scale(gameObject, Vector3.zero, 0.5f)
+                .setEase(LeanTweenType.easeInOutQuad)
+        );
+
+        sequence.append(() =>
+        {
+            MainGrid.Instance.ClearTrayInCell(this);
+            Destroy(gameObject);
+        });
+
+        return sequence;
+    }
+
+    public LTSeq CompletedAndDespawn()
+    {
+        var sequence = LeanTween.sequence();
+
+        sequence.append(
+            LeanTween.scale(gameObject, Vector3.zero, 0.5f)
+                .setEase(LeanTweenType.easeInOutQuad)
+        );
+
+        sequence.append(
+            LeanTween.rotateAround(gameObject, Vector3.up, 360, 0.5f)
+                .setEase(LeanTweenType.easeInOutQuad)
+        );
+
+        sequence.append(() =>
+        {
+            MainGrid.Instance.ClearTrayInCell(this);
+            Destroy(gameObject);
+        });
+
+        return sequence;
+    }
+
+    private void DestroySelf() => Destroy(gameObject);
 }

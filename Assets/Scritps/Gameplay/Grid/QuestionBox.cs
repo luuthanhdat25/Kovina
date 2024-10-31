@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class QuestionBox : MonoBehaviour
+public class QuestionBox : MonoBehaviour, IObject
 {
     [SerializeField]
     private float scaleOutDuration = 1f;
@@ -16,6 +16,11 @@ public class QuestionBox : MonoBehaviour
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+    }
+
+    public void DoAction()
+    {
+        Open();
     }
 
     public void Open()

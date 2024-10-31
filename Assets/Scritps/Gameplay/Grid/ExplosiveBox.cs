@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class ExplosiveBox : MonoBehaviour
+public class ExplosiveBox : MonoBehaviour, IObject
 {
     [SerializeField]
     private float scaleInDuration = .5f;
@@ -27,14 +27,14 @@ public class ExplosiveBox : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    private void OnMouseDown()
+    public void DoAction()
     {
         Explode();
     }
 
     public void Explode()
     {
-        cellPlace.SetContainObjectFalse();
+        cellPlace.ClearContainObject();
         DoAnimation();
     }
 

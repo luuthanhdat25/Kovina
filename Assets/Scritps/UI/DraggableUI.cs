@@ -17,7 +17,7 @@ public class DraggableUI : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndD
     public virtual void OnBeginDrag(PointerEventData eventData)
     {
         canvasGroup.blocksRaycasts = false;
-        Debug.Log($"DraggableUI: Begin Dragging {gameObject.name} at position: {rectTransform.anchoredPosition}.");
+        //Debug.Log($"DraggableUI: Begin Dragging {gameObject.name} at position: {rectTransform.anchoredPosition}.");
     }
 
     public virtual void OnDrag(PointerEventData eventData)
@@ -31,6 +31,6 @@ public class DraggableUI : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndD
     public virtual void OnEndDrag(PointerEventData eventData)
     {
         canvasGroup.blocksRaycasts = true;
-        Debug.Log($"DraggableUI: End Dragging {gameObject.name} at position: {rectTransform.anchoredPosition}.");
+        //Debug.Log($"DraggableUI: End Dragging {gameObject.name} at position: {rectTransform.anchoredPosition}.");
     }
 }

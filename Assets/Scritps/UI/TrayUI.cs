@@ -28,9 +28,14 @@ public class TrayUI : DraggableUI
     public void SetItemImages(List<ItemType> itemTypes)
     {
         var itemSprites = ItemTraditionalManager.Instance.Spawner.GetSpritesForItems(itemTypes);
-        for (int i = 0; i < imageImages.Count; i++)
+
+        // Just show number of item in itemSprites
+        imageImages.ForEach(image => image.enabled = false);
+
+        for (int i = 0; i < itemTypes.Count; i++)
         {
-            imageImages[i].sprite = itemSprites[i];
+            imageImages[i].sprite = itemSprites[i]; 
+            imageImages[i].enabled = true;         
         }
     }
 
@@ -75,12 +80,12 @@ public class TrayUI : DraggableUI
         Tray trayComponent = TrayManager.Instance.GetTraUnplace(index);
         trayComponent.ResetCoordinate();
 
-        bool isPlace = trayComponent.SetPlaceInCell();
+        (bool isPlace, Cell cellPlaced) = trayComponent.SetPlaceInCell();
         SetPlaceStatus(trayComponent, isPlace);
 
         if (isPlace)
         {
-            TrayManager.Instance.OnTrayPlaced();
+            TrayManager.Instance.OnTrayPlaced(trayComponent, cellPlaced);
         }
         return isPlace;
     }
