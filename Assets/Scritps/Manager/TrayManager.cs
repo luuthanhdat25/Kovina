@@ -73,7 +73,7 @@ public class TrayManager : Singleton<TrayManager>
         List<ItemTraditional> trayCenterItemList = trayCenter.GetItemTraditionalsList();
         int noiTrayCenter = trayCenterItemList.Count; // noi = Number Of Item
 
-        // 1-1 First(Hori or Verti)
+        // 2 Tray (Hori or Verti)
         if (trayHoriList.Count + trayVertiList.Count == 1)
         {
             trayHoriList.AddRange(trayVertiList);
@@ -94,7 +94,15 @@ public class TrayManager : Singleton<TrayManager>
             trayInteract.ShortAndMoveItemToPositionOrDespawn();
             trayCenter.ShortAndMoveItemToPositionOrDespawn();
         }
-        
+        else if((trayHoriList.Count == 0 && trayVertiList.Count > 1) || (trayHoriList.Count > 1 && trayVertiList.Count == 0)) //3 tray (Hori or Verti) 
+        {
+            trayHoriList.AddRange(trayVertiList);
+        }
+    }
+
+    private void Match3Tray(Tray trayCenter, Tray trayAroundList)
+    {
+
     }
 
     private void Match2Tray(Tray tray1, Tray tray2)
