@@ -195,4 +195,18 @@ public class MainGrid : Singleton<MainGrid>
 
         return (-1, -1);
     }
+
+    public void ClearTrayInCell(Tray tray)
+    {
+        for (int x = 0; x < widthSize; x++)
+        {
+            for (int y = 0; y < heightSize; y++)
+            {
+                if (cellArray[x, y].GetContainObject() == tray as IObject)
+                {
+                    cellArray[x, y].ClearContainObject();
+                }
+            }
+        }
+    }
 }

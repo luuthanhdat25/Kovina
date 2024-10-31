@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEditorInternal.VersionControl;
 using UnityEngine;
 
 public class Tray : MonoBehaviour, IObject
@@ -33,23 +35,76 @@ public class Tray : MonoBehaviour, IObject
         item.transform.SetParent(this.transform);
     }
 
-    public void ShortAndMoveItemToPosition()
+    public LTSeq ShortAndMoveItemToPositionOrDespawn()
     {
-        itemTraditionalList.Sort((a, b) => a.ItemType.CompareTo(b.ItemType));
-        for (int i = 0; i < itemTraditionalList.Count; i++)
+        var sequence = LeanTween.sequence();
+
+        if (itemTraditionalList.Count > 0)
         {
-            MoveItemToPosition(itemTraditionalList[i], points[i]);
+            itemTraditionalList.Sort((a, b) => a.ItemType.CompareTo(b.ItemType));
+
+            for (int i = 0; i < itemTraditionalList.Count; i++)
+            {
+                int index = i;
+                if(itemTraditionalList[index] == null)
+                {
+                    itemTraditionalList.Remove(itemTraditionalList[index]);
+                }
+                else
+                {
+                    sequence.append(() => MoveItemToPosition(itemTraditionalList[index], points[index]));
+                }
+            }
+            sequence.append(1f);
+            sequence.append(() =>
+            {
+                if (IsMatch3ItemCompleted())
+                {
+                    CompletedAndDespawn();
+                }
+            });
         }
+        else
+        {
+            sequence.append(.5f);
+            sequence.append(() => Despawn());
+        }
+
+        return sequence;
     }
 
-    private void MoveItemToPosition(ItemTraditional item, Transform pointPoisiton)
+
+    private bool IsMatch3ItemCompleted()
     {
-        item.transform.position = pointPoisiton.position;
+        if(itemTraditionalList.Count < 3) return false;
+        ItemType itemTypeBase = itemTraditionalList.First().ItemType;
+        for(int i = 1; i< itemTraditionalList.Count; i++)
+        {
+            if (itemTraditionalList[i].ItemType != itemTypeBase) return false;
+        }
+        return true;
+    }
+
+    private void MoveItemToPosition(ItemTraditional item, Transform pointPosition)
+    {
+        LeanTween.move(item.gameObject, pointPosition.position, 0.5f).setEase(LeanTweenType.easeInOutQuad);
     }
 
     public void ClearItemTraditionalList()
     {
         this.itemTraditionalList.Clear();
+    }
+
+    public void AddRangeItem(List<ItemTraditional> itemList)
+    {
+        foreach (var item in itemList)
+        {
+            if(item != null) 
+            {
+                itemTraditionalList.Add(item);
+                item.transform.SetParent(this.transform);
+            }
+        }
     }
 
     public void RemoveItem(ItemTraditional item)
@@ -169,14 +224,45 @@ public class Tray : MonoBehaviour, IObject
         return;
     }
 
-    public void Despawn()
+    public LTSeq Despawn()
     {
-        Invoke("DestroySelf", 0.5f);
+        var sequence = LeanTween.sequence();
+
+        sequence.append(
+            LeanTween.scale(gameObject, Vector3.zero, 0.5f)
+                .setEase(LeanTweenType.easeInOutQuad)
+        );
+
+        sequence.append(() =>
+        {
+            MainGrid.Instance.ClearTrayInCell(this);
+            Destroy(gameObject);
+        });
+
+        return sequence;
     }
 
-    public void CompletedAndDespawn()
+    public LTSeq CompletedAndDespawn()
     {
-        Invoke("DestroySelf", 0.5f);
+        var sequence = LeanTween.sequence();
+
+        sequence.append(
+            LeanTween.scale(gameObject, Vector3.zero, 0.5f)
+                .setEase(LeanTweenType.easeInOutQuad)
+        );
+
+        sequence.append(
+            LeanTween.rotateAround(gameObject, Vector3.up, 360, 0.5f)
+                .setEase(LeanTweenType.easeInOutQuad)
+        );
+
+        sequence.append(() =>
+        {
+            MainGrid.Instance.ClearTrayInCell(this);
+            Destroy(gameObject);
+        });
+
+        return sequence;
     }
 
     private void DestroySelf() => Destroy(gameObject);
