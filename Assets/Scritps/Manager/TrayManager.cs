@@ -51,7 +51,7 @@ public class TrayManager : Singleton<TrayManager>
             trayUIContainer.OnEnableTraysUI();
         }
 
-        Debug.Log($"Placed Tray {trayComponent.name} in {cellPlaced.name}");
+        //Debug.Log($"Placed Tray {trayComponent.name} in {cellPlaced.name}");
         Tray trayCenter;
         if (cellPlaced.GetContainObject() is Tray tray)
         {
@@ -138,50 +138,53 @@ public class TrayManager : Singleton<TrayManager>
             ItemTraditional itemMoveToOther = trayHave2Item.GetItemTraditionalsList().FirstOrDefault(item => item.ItemType != itemTypeMostFrequence);
 
             trayHave2Item.RemoveItem(itemMoveToOther);
-            trayHave1Item.AddItem(itemMoveToOther);
             trayHave1Item.RemoveItem(itemMoveToMatch);
+            trayHave1Item.AddItem(itemMoveToOther);
             trayHave2Item.AddItem(itemMoveToMatch);
         }
         else //2 or move frequence
         {
-            List<ItemTraditional> itemListFrequence = new List<ItemTraditional>();
-            List<ItemTraditional> itemListOther = new List<ItemTraditional>();
-            foreach (var item in itemList)
+            if(tray1ItemList.Count == 1 || tray1ItemList.Count == 2)
             {
-                if (item.ItemType == itemTypeMostFrequence)
-                {
-                    itemListFrequence.Add(item);
-                }
-                else
-                {
-                    itemListOther.Add(item);
-                }
-            }
-            (ItemType itemTypeSecondFrequence, int countFrequence2) = GetMostFrequentItemType(itemListOther);
+                Tray trayHave1Item = tray1ItemList.Count == 1 ? tray1 : tray2;
+                Tray trayOther = trayHave1Item == tray2 ? tray1 : tray2;
+                ItemTraditional itemMoveToMatch = trayOther.GetItemTraditionalsList().FirstOrDefault(item => item.ItemType == itemTypeMostFrequence);
 
-            if (countFrequence2 == 2)
-            {
-                ItemTraditional itemOther2 = itemListOther.FirstOrDefault(item => item.ItemType != itemTypeSecondFrequence);
-                if (itemOther2 != null) itemListFrequence.Add(itemOther2);
+                trayOther.RemoveItem(itemMoveToMatch);
+                trayHave1Item.AddItem(itemMoveToMatch);
             }
             else
             {
-                if (itemListOther.Count > 3)
+                List<ItemTraditional> itemListFrequence = new List<ItemTraditional>();
+                List<ItemTraditional> itemListOther = new List<ItemTraditional>();
+                foreach (var item in itemList)
                 {
-                    ItemTraditional itemOther2 = itemListOther.FirstOrDefault();
-                    itemListFrequence.Add(itemOther2);
+                    if (item.ItemType == itemTypeMostFrequence)
+                    {
+                        itemListFrequence.Add(item);
+                    }
+                    else
+                    {
+                        itemListOther.Add(item);
+                    }
                 }
-            }
 
-            if (tray1ItemList.Count == 1)
-            {
-                tray1.ClearItemTraditionalList();
-                tray2.ClearItemTraditionalList();
-                tray1.AddRangeItem(itemListFrequence);
-                tray2.AddRangeItem(itemListOther);
-            }
-            else
-            {
+                if (itemListOther.Count == 4)
+                {
+                    itemListOther.Sort((item1, item2) => item1.ItemType.CompareTo(item2.ItemType));
+                    (ItemType itemTypeSecondFrequence, int countFrequence2) = GetMostFrequentItemType(itemListOther);
+
+                    ItemTraditional itemOther2;
+                    if (countFrequence2 == 1) itemOther2 = itemListOther.First();
+                    else itemOther2 = itemListOther.FirstOrDefault(item => item.ItemType != itemTypeSecondFrequence);
+
+                    if (itemOther2 != null)
+                    {
+                        itemListFrequence.Add(itemOther2);
+                        itemListOther.Remove(itemOther2);
+                    }
+                }
+
                 tray1.ClearItemTraditionalList();
                 tray2.ClearItemTraditionalList();
                 tray2.AddRangeItem(itemListFrequence);

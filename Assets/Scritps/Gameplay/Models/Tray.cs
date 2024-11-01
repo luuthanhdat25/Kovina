@@ -30,7 +30,7 @@ public class Tray : MonoBehaviour, IObject
 
     public void AddItem(ItemTraditional item)
     {
-        if (item == null) return;
+        if (item == null || itemTraditionalList.Count >=3) return;
         itemTraditionalList.Add(item);
         item.transform.SetParent(this.transform);
     }
@@ -99,12 +99,17 @@ public class Tray : MonoBehaviour, IObject
     {
         foreach (var item in itemList)
         {
-            if(item != null) 
+            if(item != null && itemTraditionalList.Count < 3) 
             {
                 itemTraditionalList.Add(item);
                 item.transform.SetParent(this.transform);
             }
         }
+    }
+
+    public void ChangeItemList(List<ItemTraditional> itemList)
+    {
+        itemTraditionalList = itemList;
     }
 
     public void RemoveItem(ItemTraditional item)
