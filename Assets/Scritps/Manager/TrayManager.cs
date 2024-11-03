@@ -69,127 +69,145 @@ public class TrayManager : Singleton<TrayManager>
         List<Tray> trayVertiList = GetTrayListFromCellList(cellsVertiList);
         Debug.Log($"Tray [hori: {trayHoriList.Count}, verti: {trayVertiList.Count}]");
         if (trayHoriList.Count == 0 && trayVertiList.Count == 0) return;
-        if (!IsTrayMatchWithTrayList(trayCenter, trayHoriList) && !IsTrayMatchWithTrayList(trayCenter, trayVertiList)) return;
-        List<ItemTraditional> trayCenterItemList = trayCenter.GetItemTraditionalsList();
-        int noiTrayCenter = trayCenterItemList.Count; // noi = Number Of Item
 
         // 2 Tray (Hori or Verti)
         if (trayHoriList.Count + trayVertiList.Count == 1)
         {
             trayHoriList.AddRange(trayVertiList);
-            Tray trayInteract = trayHoriList[0];
-            List<ItemTraditional> trayInteractItemList = trayInteract.GetItemTraditionalsList();
-
-            int noiTrayInteract = trayInteractItemList.Count;
-            if (noiTrayCenter + noiTrayInteract == 2)
-            {
-                var itemMove = trayCenterItemList[0];
-                trayInteract.AddItem(itemMove);
-                trayCenter.RemoveItem(itemMove);
-            }
-            else
-            {
-                Match2Tray(trayCenter, trayInteract);
-            }
-            trayInteract.ShortAndMoveItemToPositionOrDespawn();
-            trayCenter.ShortAndMoveItemToPositionOrDespawn();
+            Match2Tray(trayCenter, trayHoriList[0], true);
         }
         else if ((trayHoriList.Count == 0 && trayVertiList.Count > 1) || (trayHoriList.Count > 1 && trayVertiList.Count == 0)) //3 tray (Hori or Verti) 
         {
             trayHoriList.AddRange(trayVertiList);
+            Match3TrayStraight(trayCenter, trayHoriList);
         }
     }
 
-    private void Match3Tray(Tray trayCenter, List<Tray> trayAroundList)
+    private void Match3TrayStraight(Tray trayCenter, List<Tray> trayAroundList)
     {
-        List<ItemTraditional> itemList = new();
-        var itemTrayCenterList = trayCenter.GetItemTraditionalsList();
-        var itemTrayAroundList = new List<ItemTraditional>();
-        trayAroundList.ForEach(tray => itemTrayAroundList.AddRange(tray.GetItemTraditionalsList()));
+        List<Tray> trayInteracts = GetTrayListMatch(trayCenter, trayAroundList);
+        if (trayInteracts.Count == 0) return;
+        
+        if (trayInteracts.Count == 1)
+        {
+            Match2Tray(trayCenter, trayInteracts[0], true);
+        }
+        else // 2 Tray Interact
+        {
+            var itemTrayCenterList = trayCenter.GetItemTraditionalsList();
+            if (itemTrayCenterList.Count == 1)
+            {
 
-        itemList.AddRange(itemTrayCenterList);
-        itemList.AddRange(itemTrayAroundList);
+            }
+
+            List<ItemTraditional> itemList = new();
+            var itemTrayAroundList = new List<ItemTraditional>();
+            trayAroundList.ForEach(tray => itemTrayAroundList.AddRange(tray.GetItemTraditionalsList()));
+
+            itemList.AddRange(itemTrayCenterList);
+            itemList.AddRange(itemTrayAroundList);
+        }
 
 
     }
 
-    private void Match2Tray(Tray tray1, Tray tray2)
+    private void Match2Tray(Tray tray1, Tray tray2, bool isShort)
     {
+        if (!IsTrayMatchWithTray(tray1, tray2)) return;
+
         List<ItemTraditional> itemList = new();
         List<ItemTraditional> tray1ItemList = tray1.GetItemTraditionalsList();
         List<ItemTraditional> tray2ItemList = tray2.GetItemTraditionalsList();
         itemList.AddRange(tray1ItemList);
         itemList.AddRange(tray2ItemList);
-        itemList.Sort((item1, item2) => item1.ItemType.CompareTo(item2.ItemType));
 
-        (ItemType itemTypeMostFrequence, int countFrequence) = GetMostFrequentItemType(itemList);
-        Debug.Log($"Most frequence Item: {itemTypeMostFrequence.ToString()}, {countFrequence}");
-
-        if (countFrequence >= 3)
+        if (itemList.Count == 2)
         {
-            int count = 0;
-            foreach (var item in tray2ItemList)
-            {
-                if (item.ItemType == itemTypeMostFrequence) count++;
-            }
-            Tray trayHave2Item = count == 2 ? tray2 : tray1;
-            Tray trayHave1Item = trayHave2Item == tray2 ? tray1 : tray2;
-            ItemTraditional itemMoveToMatch = trayHave1Item.GetItemTraditionalsList().FirstOrDefault(item => item.ItemType == itemTypeMostFrequence);
-            ItemTraditional itemMoveToOther = trayHave2Item.GetItemTraditionalsList().FirstOrDefault(item => item.ItemType != itemTypeMostFrequence);
-
-            trayHave2Item.RemoveItem(itemMoveToOther);
-            trayHave1Item.RemoveItem(itemMoveToMatch);
-            trayHave1Item.AddItem(itemMoveToOther);
-            trayHave2Item.AddItem(itemMoveToMatch);
+            var itemMove = tray1ItemList[0];
+            tray1.RemoveItem(itemMove);
+            tray2.AddItem(itemMove);
         }
-        else //2 or move frequence
+        else
         {
-            if(tray1ItemList.Count == 1 || tray1ItemList.Count == 2)
+            itemList.Sort((item1, item2) => item1.ItemType.CompareTo(item2.ItemType));
+
+            (ItemType itemTypeMostFrequence, int countFrequence) = GetMostFrequentItemType(itemList);
+            Debug.Log($"Most frequence Item: {itemTypeMostFrequence.ToString()}, {countFrequence}");
+
+            if (countFrequence >= 3)
             {
-                Tray trayHave1Item = tray1ItemList.Count == 1 ? tray1 : tray2;
-                Tray trayOther = trayHave1Item == tray2 ? tray1 : tray2;
-                ItemTraditional itemMoveToMatch = trayOther.GetItemTraditionalsList().FirstOrDefault(item => item.ItemType == itemTypeMostFrequence);
+                int count = 0;
+                foreach (var item in tray2ItemList)
+                {
+                    if (item.ItemType == itemTypeMostFrequence) count++;
+                }
+                Tray trayHave2Item = count == 2 ? tray2 : tray1;
+                Tray trayHave1Item = trayHave2Item == tray2 ? tray1 : tray2;
+                ItemTraditional itemMoveToMatch = trayHave1Item.GetItemTraditionalsList().FirstOrDefault(item => item.ItemType == itemTypeMostFrequence);
+                ItemTraditional itemMoveToOther = trayHave2Item.GetItemTraditionalsList().FirstOrDefault(item => item.ItemType != itemTypeMostFrequence);
 
-                trayOther.RemoveItem(itemMoveToMatch);
-                trayHave1Item.AddItem(itemMoveToMatch);
+                trayHave2Item.RemoveItem(itemMoveToOther);
+                trayHave1Item.RemoveItem(itemMoveToMatch);
+                trayHave1Item.AddItem(itemMoveToOther);
+                trayHave2Item.AddItem(itemMoveToMatch);
             }
-            else
+            else //2 or move frequence
             {
-                List<ItemTraditional> itemListFrequence = new List<ItemTraditional>();
-                List<ItemTraditional> itemListOther = new List<ItemTraditional>();
-                foreach (var item in itemList)
+                if (tray1ItemList.Count == 1 || tray1ItemList.Count == 2)
                 {
-                    if (item.ItemType == itemTypeMostFrequence)
-                    {
-                        itemListFrequence.Add(item);
-                    }
-                    else
-                    {
-                        itemListOther.Add(item);
-                    }
-                }
+                    Tray trayHave1Item = tray1ItemList.Count == 1 ? tray1 : tray2;
+                    Tray trayOther = trayHave1Item == tray2 ? tray1 : tray2;
+                    ItemTraditional itemMoveToMatch = trayOther.GetItemTraditionalsList().FirstOrDefault(item => item.ItemType == itemTypeMostFrequence);
 
-                if (itemListOther.Count == 4)
+                    trayOther.RemoveItem(itemMoveToMatch);
+                    trayHave1Item.AddItem(itemMoveToMatch);
+                }
+                else
                 {
-                    itemListOther.Sort((item1, item2) => item1.ItemType.CompareTo(item2.ItemType));
-                    (ItemType itemTypeSecondFrequence, int countFrequence2) = GetMostFrequentItemType(itemListOther);
-
-                    ItemTraditional itemOther2;
-                    if (countFrequence2 == 1) itemOther2 = itemListOther.First();
-                    else itemOther2 = itemListOther.FirstOrDefault(item => item.ItemType != itemTypeSecondFrequence);
-
-                    if (itemOther2 != null)
+                    List<ItemTraditional> itemListFrequence = new List<ItemTraditional>();
+                    List<ItemTraditional> itemListOther = new List<ItemTraditional>();
+                    foreach (var item in itemList)
                     {
-                        itemListFrequence.Add(itemOther2);
-                        itemListOther.Remove(itemOther2);
+                        if (item.ItemType == itemTypeMostFrequence)
+                        {
+                            itemListFrequence.Add(item);
+                        }
+                        else
+                        {
+                            itemListOther.Add(item);
+                        }
                     }
-                }
 
-                tray1.ClearItemTraditionalList();
-                tray2.ClearItemTraditionalList();
-                tray2.AddRangeItem(itemListFrequence);
-                tray1.AddRangeItem(itemListOther);
+                    if (itemListOther.Count == 4)
+                    {
+                        itemListOther.Sort((item1, item2) => item1.ItemType.CompareTo(item2.ItemType));
+                        (ItemType itemTypeSecondFrequence, int countFrequence2) = GetMostFrequentItemType(itemListOther);
+
+                        ItemTraditional itemOther2;
+                        if (countFrequence2 == 1) itemOther2 = itemListOther.First();
+                        else itemOther2 = itemListOther.FirstOrDefault(item => item.ItemType != itemTypeSecondFrequence);
+
+                        if (itemOther2 != null)
+                        {
+                            itemListFrequence.Add(itemOther2);
+                            itemListOther.Remove(itemOther2);
+                        }
+                    }
+
+                    tray1.ClearItemTraditionalList();
+                    tray2.ClearItemTraditionalList();
+                    tray2.AddRangeItem(itemListFrequence);
+
+                    itemListOther.Sort((itemA, itemB) => itemA.ItemType.CompareTo(itemB.ItemType));
+                    tray1.AddRangeItem(itemListOther);
+                }
             }
+        }
+        
+        if (isShort)
+        {
+            tray1.ShortAndMoveItemToPositionOrDespawn();
+            tray2.ShortAndMoveItemToPositionOrDespawn();
         }
     }
 
@@ -212,8 +230,6 @@ public class TrayManager : Singleton<TrayManager>
     }
 
 
-
-
     private List<Tray> GetTrayListFromCellList(List<Cell> cellList)
     {
         List<Tray> trayList = new List<Tray>();
@@ -228,9 +244,11 @@ public class TrayManager : Singleton<TrayManager>
         return trayList;
     }
 
-    private bool IsTrayHaveOneOfRequireItems(Tray tray, List<ItemTraditional> requireItems)
+    private bool IsTrayMatchWithTray(Tray tray1, Tray tray2)
     {
-        foreach (var item in tray.GetItemTraditionalsList())
+        var requireItems = tray2.GetItemTraditionalsList();
+        var checkItems = tray1.GetItemTraditionalsList();
+        foreach (var item in checkItems)
         {
             var existItem = requireItems.FirstOrDefault(reItem => reItem.ItemType == item.ItemType);
             if (existItem != null) return true;
@@ -238,18 +256,34 @@ public class TrayManager : Singleton<TrayManager>
         return false;
     }
 
-    private bool IsTrayMatchWithTrayList(Tray trayCheck, List<Tray> trayList)
+    private List<Tray> GetTrayListMatch(Tray trayCheck, List<Tray> trayList)
     {
-        if (trayList.Count == 0) return false;
-        List<ItemTraditional> itemHoriList = new List<ItemTraditional>();
-        trayList.ForEach(tray => itemHoriList.AddRange(tray.GetItemTraditionalsList()));
+        List<Tray> trayListMath = new List<Tray>();
+        if (trayList.Count == 0) return trayListMath;
+
+        List<ItemType> itemCheckTypeList = new List<ItemType>();
 
         foreach (var item in trayCheck.GetItemTraditionalsList())
         {
-            var existItem = itemHoriList.FirstOrDefault(reItem => reItem.ItemType == item.ItemType);
-            if (existItem != null) return true;
+            if (!itemCheckTypeList.Contains(item.ItemType))
+            {
+                itemCheckTypeList.Add(item.ItemType);
+            }
         }
-        return false;
+
+        foreach (var itemType in itemCheckTypeList)
+        {
+            foreach (var tray in trayList)
+            {
+                var existItem = tray.GetItemTraditionalsList()
+                                    .FirstOrDefault(reItem => reItem.ItemType == itemType);
+                if (existItem != null && !trayListMath.Contains(tray))
+                {
+                    trayListMath.Add(tray);
+                }
+            }
+        }
+        return trayListMath;
     }
 
 
