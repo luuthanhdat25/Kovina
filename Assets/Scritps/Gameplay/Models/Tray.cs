@@ -28,11 +28,25 @@ public class Tray : MonoBehaviour, IObject
         positionStart = transform.position;
     }
 
-    public void AddItem(ItemTraditional item)
+    public int NumberOfItem() => itemTraditionalList.Count;
+
+    public bool IsContainItem(ItemTraditional itemCheck)
     {
-        if (item == null || itemTraditionalList.Count >=3) return;
+        foreach (var item in itemTraditionalList)
+        {
+            if (item == itemCheck) return true;
+        }
+        return false;
+    }
+
+    public bool AddItem(ItemTraditional item)
+    {
+        if (item == null || itemTraditionalList.Count >=3) return false;
+        if(IsContainItem(item)) return false;
+
         itemTraditionalList.Add(item);
         item.transform.SetParent(this.transform);
+        return true;
     }
 
     public LTSeq ShortAndMoveItemToPositionOrDespawn()
@@ -73,8 +87,13 @@ public class Tray : MonoBehaviour, IObject
         return sequence;
     }
 
+    public int CountItemsOfType(ItemType itemType)
+    {
+        return itemTraditionalList.Count(item => item.ItemType == itemType);
+    }
 
-    private bool IsMatch3ItemCompleted()
+
+    public bool IsMatch3ItemCompleted()
     {
         if(itemTraditionalList.Count < 3) return false;
         ItemType itemTypeBase = itemTraditionalList.First().ItemType;
@@ -253,11 +272,6 @@ public class Tray : MonoBehaviour, IObject
 
         sequence.append(
             LeanTween.scale(gameObject, Vector3.zero, 0.5f)
-                .setEase(LeanTweenType.easeInOutQuad)
-        );
-
-        sequence.append(
-            LeanTween.rotateAround(gameObject, Vector3.up, 360, 0.5f)
                 .setEase(LeanTweenType.easeInOutQuad)
         );
 
