@@ -39,5 +39,22 @@
             }
         }
     },
-    "CurrentLanguage": "English"
+    "PauseData": {
+        "Continue": {
+            "English": "Continue",
+            "Vietnamese": "Tiếp tục",
+            "Korean": "계속"
+        },
+        "BackToMenu": {
+            "English": "Back to Menu",
+            "Vietnamese": "Quay lại Menu",
+            "Korean": "메뉴로 돌아가기"
+        },
+        "BackToRoadMap": {
+            "English": "Back to RoadMap",
+            "Vietnamese": "Quay lại RoadMap",
+            "Korean": "로드맵으로 돌아가기"
+        }
+    },
+    "CurrentLanguage": "Vietnamese"
 }

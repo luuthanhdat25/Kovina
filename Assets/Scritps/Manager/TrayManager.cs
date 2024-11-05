@@ -50,7 +50,7 @@ public class TrayManager : Singleton<TrayManager>
             OnEnoughTrayPlaced?.Invoke();
             trayUIContainer.OnEnableTraysUI();
         }
-
+        SoundManager.Instance.PlayPutDownSound();
         Debug.Log($"Placed Tray {trayComponent.name} in {cellPlaced.name}");
         Tray trayCenter;
         if (cellPlaced.GetContainObject() is Tray tray)
@@ -188,6 +188,7 @@ public class TrayManager : Singleton<TrayManager>
                 tray1.AddRangeItem(itemListOther);
             }
         }
+        SoundManager.Instance.PlayMergeSound();
     }
 
     private (ItemType, int count) GetMostFrequentItemType(List<ItemTraditional> sortedItemList)

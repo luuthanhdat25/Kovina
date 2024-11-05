@@ -23,7 +23,16 @@ public class SoundPooling : Singleton<SoundPooling>
 
         soundEmitter.Play();
     }
-
+    public void StoppAllSound()
+    {
+        foreach (var soundEmmit in soundEmitterPool)
+        {
+            if (!soundEmmit.gameObject.activeSelf)
+            {
+                soundEmmit.Stop();
+            }
+        }
+    }
     public bool CanPlaySound(SoundSo soundSO)
     {
         return soundEmitterPool.Count < maxPoolSize;

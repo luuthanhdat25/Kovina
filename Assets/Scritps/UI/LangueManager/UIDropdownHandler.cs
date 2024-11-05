@@ -60,6 +60,6 @@ public class UIDropdownHandler : MonoBehaviour
 
     void OnDestroy()
     {
-        LocalizationManager.Instance.OnLanguageChanged -= UpdateOptions; // Unsubscribe to prevent memory leaks
+        LocalizationManager.Instance.OnLanguageChanged -= UpdateOptions; 
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 public class UIContronller : MonoBehaviour
 {
@@ -24,6 +25,7 @@ public class UIContronller : MonoBehaviour
         if (playerActionOption == GameObject.Find("PlayButton"))
         {
             Debug.Log("isPlay");
+            SceneManager.LoadScene("Roadmap");
         }
         else if (playerActionOption == GameObject.Find("CreditButton"))
         {
@@ -31,7 +33,11 @@ public class UIContronller : MonoBehaviour
         }
         else if (playerActionOption == GameObject.Find("ExitButton")) 
         {
-            Debug.Log("is Exit");
+            Debug.Log("Exited game");
+            Application.Quit();
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#endif
         }
     }
     public void ChangeToSettingUI(GameObject setting)

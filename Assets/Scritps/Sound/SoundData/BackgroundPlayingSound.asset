@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 847dbcab20e3ddb459e6671f0132608c, type: 3}
-  m_Name: BackGroundSound
+  m_Name: BackgroundPlayingSound
   m_EditorClassIdentifier: 
-  AudioClip: {fileID: 0}
+  AudioClip: {fileID: 8300000, guid: b73af56bc8d371c40ae7930df9f685b3, type: 3}
   AudioMixerGroup: {fileID: -971667190475061649, guid: 2939ab74d666e0b43abbe34cc8eabe94, type: 2}
   Volume: 1
   Loop: 1

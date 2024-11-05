@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 847dbcab20e3ddb459e6671f0132608c, type: 3}
-  m_Name: ClickSound
+  m_Name: BackGroundMenuSound
   m_EditorClassIdentifier: 
-  AudioClip: {fileID: 8300000, guid: a1343dcf893383848a828c21378fc8a7, type: 3}
-  AudioMixerGroup: {fileID: -4450111728265100282, guid: 2939ab74d666e0b43abbe34cc8eabe94, type: 2}
+  AudioClip: {fileID: 8300000, guid: 824c4e3e9411fd84dbe6fa9bc9804a4d, type: 3}
+  AudioMixerGroup: {fileID: -971667190475061649, guid: 2939ab74d666e0b43abbe34cc8eabe94, type: 2}
   Volume: 1
-  Loop: 0
+  Loop: 1
   PlayOnAwake: 1
   FrequentSound: 0

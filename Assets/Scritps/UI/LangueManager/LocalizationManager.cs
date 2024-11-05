@@ -22,11 +22,10 @@ public class LocalizationManager : Singleton<LocalizationManager>
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
-            Destroy(gameObject);
+            return;
         }
     }
 
@@ -51,10 +50,27 @@ public class LocalizationManager : Singleton<LocalizationManager>
         currentLanguage = loadedData.CurrentLanguage;
 
         localizedText = new Dictionary<string, Dictionary<string, string>>();
+        var x = loadedData.PauseData;
         AddTextToDictionary(loadedData.MenuText);
+        AddTextPauseLangue(loadedData.PauseData);
         AddSettingTextToDictionary(loadedData.SettingText);
     }
+    private void AddTextPauseLangue(PauseData pauseData)
+    {
+        foreach (var property in typeof(PauseData).GetFields())
+        {
+            var key = property.Name;
+            var pauseDatatext = (TextData)property.GetValue(pauseData);
 
+
+            localizedText[key] = new Dictionary<string, string>
+            {
+                { "English", pauseDatatext.English },
+                { "Vietnamese", pauseDatatext.Vietnamese },
+                { "Korean", pauseDatatext.Korean }
+            };
+        }
+    }
     private void AddTextToDictionary(LanguageText languageText)
     {
         foreach (var property in typeof(LanguageText).GetFields())
@@ -70,7 +86,6 @@ public class LocalizationManager : Singleton<LocalizationManager>
             };
         }
     }
-
     private void AddSettingTextToDictionary(SettingData settingData)
     {
         foreach (var property in typeof(SettingData).GetFields())
@@ -150,7 +165,15 @@ public class LocalizationData
 {
     public LanguageText MenuText;
     public SettingData SettingText;
+    public PauseData PauseData;
     public string CurrentLanguage;
+}
+[System.Serializable]
+public class PauseData
+{
+    public TextData Continue;
+    public TextData BackToMenu;
+    public TextData BackToRoadMap;
 }
 
 [System.Serializable]

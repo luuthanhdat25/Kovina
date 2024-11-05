@@ -44,8 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 058f0f25a9bb5b345b42f2d981270d66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  backgroundSound: {fileID: 11400000, guid: ea0eb24e50fc3ce49aeff0b70c496034, type: 2}
+  menuBackgroundSound: {fileID: 11400000, guid: ea0eb24e50fc3ce49aeff0b70c496034, type: 2}
   clickSound: {fileID: 11400000, guid: aa9f005298f4d67438c1e0f2f416df9a, type: 2}
   mergedSound: {fileID: 11400000, guid: dc9f2f9137a440f47b02b314c16f6d7d, type: 2}
   putDownSound: {fileID: 11400000, guid: 3fd97e661b83c5a40999f7a78f951b32, type: 2}
   victorySound: {fileID: 11400000, guid: 56942f00a83462a4c970d085f6f37277, type: 2}
+  roadMapBackGroundSound: {fileID: 11400000, guid: 809e7d033afa42d41a1a5949e55e9a1f, type: 2}
+  playingBackGroundSound: {fileID: 11400000, guid: 4f098bd7161723844b0f4d8a65d4eddc, type: 2}

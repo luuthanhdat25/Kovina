@@ -1,17 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Audio; // If you're using AudioMixer for volume control
+using UnityEngine.Audio;
+using UnityEngine.UI; // If you're using AudioMixer for volume control
 
 public class SettingController : MonoBehaviour
 {
-    public AudioMixer audioMixer; 
+    [SerializeField] private AudioMixer audioMixer;
+    [SerializeField] private Slider audioSlider;
 
+    private void Start()
+    {
+        float backgroundVolume;
+        audioMixer.GetFloat("Background", out backgroundVolume);
+        audioSlider.value = Mathf.Pow(10, backgroundVolume / 20); ;
+
+    }
     public void ChangeVolume(float volume)
     {
         Debug.Log($"Volume set to: {volume}");
         
-        audioMixer.SetFloat("Volume", Mathf.Log10(volume) * 20); // Convert linear to decibel
+        audioMixer.SetFloat("Background", Mathf.Log10(volume) * 20); 
     }
 
     public void ChangeLanguage(int index)

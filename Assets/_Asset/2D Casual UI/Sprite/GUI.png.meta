@@ -536,7 +536,7 @@ TextureImporter:
         height: 132
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 25, y: 21, z: 31, w: 17}
+      border: {x: 3, y: 21, z: 0, w: 17}
       outline: []
       physicsShape: []
       tessellationDetail: 0
@@ -656,13 +656,13 @@ TextureImporter:
       name: GUI_17
       rect:
         serializedVersion: 2
-        x: 1789
-        y: 1462
-        width: 376
-        height: 139
+        x: 1788
+        y: 1463
+        width: 392
+        height: 138
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 23, y: 50, z: 0, w: 50}
+      border: {x: 0, y: 50, z: 0, w: 50}
       outline: []
       physicsShape: []
       tessellationDetail: 0
