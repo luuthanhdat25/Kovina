@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class QuestionBox : MonoBehaviour, IObject
@@ -18,18 +19,12 @@ public class QuestionBox : MonoBehaviour, IObject
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    public void DoAction()
+    public float DoAction()
     {
-        Open();
+        return 0;
     }
 
-    public void Open()
-    {
-        Instantiate(trayPrefab, transform.position, Quaternion.identity);
-        DoAnimation();
-    }
-
-    private void DoAnimation()
+    private float DoAnimation()
     {
         Color spriteColor = spriteRenderer.color;
         spriteRenderer.sortingOrder = 5;
@@ -39,11 +34,13 @@ public class QuestionBox : MonoBehaviour, IObject
             spriteColor.a = alphaValue;
             spriteRenderer.color = spriteColor;
         }).setEase(LeanTweenType.easeInOutQuad);
+        return scaleOutDuration;
     }
 
-    private void OnMouseDown()
+    public float DoAction(Cell cellPlaced)
     {
-        Debug.Log("Click");
-        Open();
+        Debug.Log("Cell Place new Tray: " + cellPlaced.name);
+        TrayManager.Instance.CreatePlacedTray(cellPlaced);
+        return DoAnimation();
     }
 }

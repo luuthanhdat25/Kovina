@@ -4,5 +4,6 @@ using UnityEngine;
 /// Define a Object in Cell
 /// </summary>
 public interface IObject {
-    public void DoAction();
+    public float DoAction();
+    public float DoAction(Cell cellPlaced);
 }
