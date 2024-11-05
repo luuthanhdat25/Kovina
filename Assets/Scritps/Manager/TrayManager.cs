@@ -22,6 +22,16 @@ public class TrayManager : Singleton<TrayManager>
     private Tray trayPresent;
 
     private int countTrayPlaced = 0;
+    private bool canAddTray = true;
+    public bool CanAddTray => canAddTray;
+
+    //Dat Add
+    public class CompletedMatchItemEventArg : EventArgs
+    {
+        public ItemType ItemType;
+    }
+
+    public EventHandler<CompletedMatchItemEventArg> OnCompletedMatchItem;
 
     private void Start() => SpawnUnplacedTraies();
 
@@ -42,7 +52,8 @@ public class TrayManager : Singleton<TrayManager>
         OnEnoughTrayPlaced -= SpawnUnplacedTraies;
     }
 
-    public void OnTrayPlaced(Tray trayComponent, Cell cellPlaced)
+    #region Tray Match Algorithm
+    public void OnTrayPlaced(Tray trayPlaced, Cell cellPlaced)
     {
         countTrayPlaced = countTrayPlaced + 1;
         if (countTrayPlaced >= TRAY_UI_MAXIMUM)
@@ -51,14 +62,7 @@ public class TrayManager : Singleton<TrayManager>
             OnEnoughTrayPlaced?.Invoke();
             trayUIContainer.OnEnableTraysUI();
         }
-
-        //Debug.Log($"Placed Tray {trayComponent.name} in {cellPlaced.name}");
-        Tray trayCenter;
-        if (cellPlaced.GetContainObject() is Tray tray)
-        {
-            trayCenter = tray;
-        }
-        else return;
+        trayPlaced.SetCellPlaced(cellPlaced);
 
         // Do Algorithm
         List<Cell> cellsHoriList = MainGrid.Instance.GetCellsHorizontal(cellPlaced);
@@ -71,39 +75,49 @@ public class TrayManager : Singleton<TrayManager>
         Debug.Log($"Tray [hori: {trayHoriList.Count}, verti: {trayVertiList.Count}]");
         if (trayHoriList.Count == 0 && trayVertiList.Count == 0) return;
 
+        float timeMatch = 0;
         
         if (trayHoriList.Count + trayVertiList.Count == 1) // 2 Tray (Hori or Verti)
         {
             trayHoriList.AddRange(trayVertiList);
-            Match2Tray(trayCenter, trayHoriList[0], true);
+            timeMatch += Match2Tray(trayPlaced, trayHoriList[0], true);
         }
         else if ((trayHoriList.Count == 0 && trayVertiList.Count > 1) || (trayHoriList.Count > 1 && trayVertiList.Count == 0)) //3 tray (Hori or Verti) 
         {
             trayHoriList.AddRange(trayVertiList);
-            Match3Tray(trayCenter, trayHoriList);
+            timeMatch += Match3Tray(trayPlaced, trayHoriList);
         }
         else // >3 Tray (Hori and Verti)
         {
-            MatchTrayPlus(trayCenter, trayHoriList, trayVertiList);
+            timeMatch += MatchTrayPlus(trayPlaced, trayHoriList, trayVertiList);
         }
+        Debug.Log("[TrayManager]Delay time: " + timeMatch);
+        StartCoroutine(WaitForMatchCompleted(timeMatch));
     }
 
-    private void MatchTrayPlus(Tray trayCenter, List<Tray> trayHoriList, List<Tray> trayVertiList)
+    private IEnumerator WaitForMatchCompleted(float timeMatch)
+    {
+        canAddTray = false;
+        yield return new WaitForSeconds(timeMatch);
+        canAddTray = true;
+    }
+
+    private float MatchTrayPlus(Tray trayCenter, List<Tray> trayHoriList, List<Tray> trayVertiList)
     {
         var trayAroundList = new List<Tray>();
         trayAroundList.AddRange(trayHoriList);
         trayAroundList.AddRange(trayVertiList);
         List<Tray> trayInteracts = GetTrayListMatch(trayCenter, trayAroundList);
+        if (trayInteracts.Count == 0) return 0f;
 
-        if (trayInteracts.Count == 0) return;
-
+        float timeMatch = 0;
         if (trayInteracts.Count == 1)
         {
-            Match2Tray(trayCenter, trayInteracts[0], true);
+            timeMatch += Match2Tray(trayCenter, trayInteracts[0], true);
         }
         else if(trayInteracts.Count == 2)
         {
-            Match3Tray(trayCenter, trayInteracts);
+            timeMatch += Match3Tray(trayCenter, trayInteracts);
         }
         else // >= 3 Tray
         {
@@ -122,8 +136,9 @@ public class TrayManager : Singleton<TrayManager>
                 trayCenter.AddItem(itemMatch);
                 firstTrayHas1Item.AddItem(itemNotMatch);
 
-                trayCenter.ShortAndMoveItemToPositionOrDespawn();
-                firstTrayHas1Item.ShortAndMoveItemToPositionOrDespawn();
+                var duration1 = trayCenter.ShortAndMoveItemToPositionOrDespawn();
+                var duration2 = firstTrayHas1Item.ShortAndMoveItemToPositionOrDespawn();
+                timeMatch += Mathf.Max(duration1, duration2);
             }
             else
             {
@@ -192,20 +207,31 @@ public class TrayManager : Singleton<TrayManager>
                 }
                 trayCenter.AddRangeItem(addCenterItem);
 
-                trayCenter.ShortAndMoveItemToPositionOrDespawn();
-                trayListInteracts.ForEach(tray => tray.ShortAndMoveItemToPositionOrDespawn());
+                float maxTimeShort = float.MinValue;
+                float trayCenterDuration = trayCenter.ShortAndMoveItemToPositionOrDespawn();
+                maxTimeShort = Mathf.Max(maxTimeShort, trayCenterDuration);
+
+                foreach (var tray in trayListInteracts)
+                {
+                    float duration = tray.ShortAndMoveItemToPositionOrDespawn();
+                    maxTimeShort = Mathf.Max(maxTimeShort, duration);
+                }
+                timeMatch += maxTimeShort;
             }
         }
+        return timeMatch;
     }
 
-    private void Match3Tray(Tray trayCenter, List<Tray> trayAroundList)
+    private float Match3Tray(Tray trayCenter, List<Tray> trayAroundList)
     {
         List<Tray> trayInteracts = GetTrayListMatch(trayCenter, trayAroundList);
-        if (trayInteracts.Count == 0) return;
-        
+        if (trayInteracts.Count == 0) return 0f;
+
+        float timeMatch = 0;
+
         if (trayInteracts.Count == 1)
         {
-            Match2Tray(trayCenter, trayInteracts[0], true);
+            timeMatch += Match2Tray(trayCenter, trayInteracts[0], true);
         }
         else // 2 Tray Interact
         {
@@ -221,7 +247,6 @@ public class TrayManager : Singleton<TrayManager>
                 }
                 else // has 1 item in each tray around
                 {
-                    List<ItemTraditional> itemTypeListMatch = new List<ItemTraditional>() { itemTrayCenterList[0] };
                     foreach (var tray in trayAroundList)
                     {
                         ItemTraditional matchItem = tray.GetItemTraditionalsList().FirstOrDefault(item => item.ItemType == centerItemType);
@@ -231,8 +256,17 @@ public class TrayManager : Singleton<TrayManager>
                             trayCenter.AddItem(matchItem);
                         }
                     }
-                    trayCenter.ShortAndMoveItemToPositionOrDespawn();
-                    trayAroundList.ForEach(tray => tray.ShortAndMoveItemToPositionOrDespawn());
+                    
+                    float maxTimeShort = float.MinValue;
+                    float trayCenterDuration = trayCenter.ShortAndMoveItemToPositionOrDespawn();
+                    maxTimeShort = Mathf.Max(maxTimeShort, trayCenterDuration);
+
+                    foreach (var tray in trayAroundList)
+                    {
+                        float duration = tray.ShortAndMoveItemToPositionOrDespawn();
+                        maxTimeShort = Mathf.Max(maxTimeShort, duration);
+                    }
+                    timeMatch += maxTimeShort;
                 }
             }
             else
@@ -250,9 +284,10 @@ public class TrayManager : Singleton<TrayManager>
 
                     trayCenter.AddItem(itemMatch);
                     firstTrayHas1Item.AddItem(itemNotMatch);
-                    
-                    trayCenter.ShortAndMoveItemToPositionOrDespawn();
-                    firstTrayHas1Item.ShortAndMoveItemToPositionOrDespawn();
+
+                    var duration1 = trayCenter.ShortAndMoveItemToPositionOrDespawn();
+                    var duration2 = firstTrayHas1Item.ShortAndMoveItemToPositionOrDespawn();
+                    timeMatch += Mathf.Max(duration1, duration2);
                 }
                 else
                 {
@@ -321,11 +356,20 @@ public class TrayManager : Singleton<TrayManager>
                     }
                     trayCenter.AddRangeItem(addCenterItem);
 
-                    trayCenter.ShortAndMoveItemToPositionOrDespawn();
-                    trayListInteracts.ForEach(tray => tray.ShortAndMoveItemToPositionOrDespawn());
+                    float maxTimeShort = float.MinValue;
+                    float trayCenterDuration = trayCenter.ShortAndMoveItemToPositionOrDespawn();
+                    maxTimeShort = Mathf.Max(maxTimeShort, trayCenterDuration);
+
+                    foreach (var tray in trayListInteracts)
+                    {
+                        float duration = tray.ShortAndMoveItemToPositionOrDespawn();
+                        maxTimeShort = Mathf.Max(maxTimeShort, duration);
+                    }
+                    timeMatch += maxTimeShort;
                 }
             }
         }
+        return timeMatch;
     }
 
     private Tray GetFirstTrayHasNumberOfItem(ItemType itemType, List<Tray> trayList, int numberOfItem)
@@ -353,9 +397,9 @@ public class TrayManager : Singleton<TrayManager>
         return returnList;
     }
 
-    private void Match2Tray(Tray tray1, Tray tray2, bool isShort)
+    private float Match2Tray(Tray tray1, Tray tray2, bool isShort)
     {
-        if (!IsTrayMatchWithTray(tray1, tray2)) return;
+        if (!IsTrayMatchWithTray(tray1, tray2)) return 0;
 
         List<ItemTraditional> itemList = new();
         List<ItemTraditional> tray1ItemList = tray1.GetItemTraditionalsList();
@@ -450,10 +494,14 @@ public class TrayManager : Singleton<TrayManager>
         
         if (isShort)
         {
-            tray1.ShortAndMoveItemToPositionOrDespawn();
-            tray2.ShortAndMoveItemToPositionOrDespawn();
+            float tray1Duration = tray1.ShortAndMoveItemToPositionOrDespawn();
+            float tray2Duration = tray2.ShortAndMoveItemToPositionOrDespawn();
+            return Mathf.Max(tray1Duration, tray2Duration);
         }
-        SoundManager.Instance.PlayMergeSound();
+        else
+        {
+            return 0;
+        }
     }
 
     private (ItemType, int count) GetMostFrequentItemType(List<ItemTraditional> sortedItemList)
@@ -473,7 +521,6 @@ public class TrayManager : Singleton<TrayManager>
         }
         return (mostFrequent, maxCount);
     }
-
 
     private List<Tray> GetTrayListFromCellList(List<Cell> cellList)
     {
@@ -532,7 +579,7 @@ public class TrayManager : Singleton<TrayManager>
         }
         return trayListMath;
     }
-
+    #endregion
 
     private void SpawnUnplacedTraies()
     {
@@ -583,6 +630,54 @@ public class TrayManager : Singleton<TrayManager>
         trayUIContainer.SetItemImageForTrayUI(itemTypes, index);
     }
 
+    //Dat Add
+    public Tray CreatePlacedTray(Cell cellPlace)
+    {
+        Transform newTray = Instantiate(trayPrefab, cellPlace.transform.position, Quaternion.identity);
+        if (newTray == null || newTray.GetComponent<Tray>() == null)
+        {
+            Debug.LogWarning("Developer, please check the prefab configuration & ensure it has a Tray component attached.");
+            Debug.LogWarning("TrayManager: trayPrefab don't have Tray component to add |FAIL|");
+            return null;
+        }
+
+        Tray trayComponent = newTray.GetComponent<Tray>();
+        CreateItemOnTray(trayComponent);
+        trayComponent.SetCellPlaced(cellPlace);
+        cellPlace.SetContainObject(trayComponent);
+        return trayComponent;
+    }
+
+    //Dat Add
+    private void CreateItemOnTray(Tray trayComponent)
+    {
+        var points = trayComponent.Points;
+        var itemTypes = new List<ItemType>();
+        trayComponent.ClearItemTraditionalList();
+
+        int numberOffItemOnTray = UnityEngine.Random.Range(2, 4); // Random number of items on Tray
+
+        for (int i = 0; numberOffItemOnTray > 0; i++, numberOffItemOnTray--)
+        {
+            ItemType itemType;
+
+            do
+            {
+                itemType = ItemTraditionalManager.Instance.Spawner.GetRandomEnumValue();
+            } while (itemTypes.Count >= 2 && itemTypes[itemTypes.Count - 1] == itemType && itemTypes[itemTypes.Count - 2] == itemType);
+
+            var item = ItemTraditionalManager.Instance.Spawner.Spawn(itemType);
+            trayComponent.AddItem(item);
+
+            item.transform.SetParent(trayComponent.transform);
+            item.transform.position = points[i].position;
+            item.transform.localScale = points[i].localScale;
+
+            itemTypes.Add(itemType);
+        }
+
+        itemTypes.Sort((itemA, itemB) => itemA.CompareTo(itemB));
+    }
 
     #region CRUD
 

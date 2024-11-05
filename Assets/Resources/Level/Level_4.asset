@@ -10,8 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 95860ea997dae224bb7c6220e8fb1c22, type: 3}
-  m_Name: Level_Grid_2
+  m_Name: Level_4
   m_EditorClassIdentifier: 
-  widthSize: 3
+  widthSize: 4
   heightSize: 3
-  boxSetUps: []
+  boxSetUps:
+  - Type: 1
+    XPosition: 1
+    YPosition: 1
+  - Type: 1
+    XPosition: 2
+    YPosition: 1

@@ -7,7 +7,7 @@ public class MainGrid : Singleton<MainGrid>
     private Cell cellPrefab;
 
     [SerializeField]
-    private string levelLoadPath = "Level/Level_Grid_";
+    private string levelLoadPath = "Level/Level_";
 
     [SerializeField]
     private int levelNumber;
@@ -34,7 +34,7 @@ public class MainGrid : Singleton<MainGrid>
 
     void Start()
     {
-        LoadLevel loadLevel = LoadLevel.Instance;
+        LoadScene loadLevel = LoadScene.Instance;
         if (loadLevel != null)
         {
             levelNumber = loadLevel.Level <= 0 ? 1 : loadLevel.Level;
@@ -44,25 +44,25 @@ public class MainGrid : Singleton<MainGrid>
             levelNumber = 1;
         }
 
-        LevelGridSO levelGridData = Resources.Load<LevelGridSO>(levelLoadPath + levelNumber);
+        LevelSetUpSO levelGridData = Resources.Load<LevelSetUpSO>(levelLoadPath + levelNumber);
         if(levelGridData != null)
         {
             InitialGrid(levelGridData);
         }
         else
         {
-            Debug.LogWarning("File" + levelLoadPath + levelNumber + " doesn't exist!");
+            Debug.LogWarning("[MainGrid] " + "File" + levelLoadPath + levelNumber + " doesn't exist!");
         }
     }
 
-    private void InitialGrid(LevelGridSO levelGridSO)
+    private void InitialGrid(LevelSetUpSO levelGridSO)
     {
         InitialCells(levelGridSO);
 
         InitialBoxs(levelGridSO);
     }
 
-    private void InitialCells(LevelGridSO levelGridSO)
+    private void InitialCells(LevelSetUpSO levelGridSO)
     {
         widthSize = levelGridSO.WidthSize;
         heightSize = levelGridSO.HeighSize;
@@ -95,7 +95,7 @@ public class MainGrid : Singleton<MainGrid>
         }
     }
 
-    private void InitialBoxs(LevelGridSO levelGridSO)
+    private void InitialBoxs(LevelSetUpSO levelGridSO)
     {
         foreach (var box in levelGridSO.BoxSetups)
         {
@@ -117,7 +117,6 @@ public class MainGrid : Singleton<MainGrid>
                             ExplosiveBox explosiveBox = Instantiate(explosiveBoxPrefab, transform);
                             iObject = explosiveBox;
                             explosiveBox.transform.position = cellArray[box.XPosition, box.YPosition].transform.position;
-                            explosiveBox.SetCellPlace(cell);
                             break;
                     }
                     cell.SetContainObject(iObject);

@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cellPrefab: {fileID: 8462421038750513712, guid: 4e4814206331ffa40b0330e183f2b5d3, type: 3}
+  levelLoadPath: Level/Level_
   levelNumber: 1
   widthPadding: 0.2
   heightPadding: 0.2

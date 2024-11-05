@@ -18,27 +18,18 @@ public class ExplosiveBox : MonoBehaviour, IObject
     private float delaySpawnEffect = 0.2f;
 
     private SpriteRenderer spriteRenderer;
-    private Cell cellPlace;
-
-    public void SetCellPlace(Cell cell) => cellPlace = cell;
 
     private void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    public void DoAction()
+    public float DoAction()
     {
-        Explode();
+        return 0;
     }
 
-    public void Explode()
-    {
-        cellPlace.ClearContainObject();
-        DoAnimation();
-    }
-
-    private void DoAnimation()
+    private float Explode()
     {
         Color spriteColor = spriteRenderer.color;
 
@@ -57,10 +48,18 @@ public class ExplosiveBox : MonoBehaviour, IObject
                             spriteRenderer.color = spriteColor;
                         }).setEase(LeanTweenType.easeInOutQuad);
                     });
+        return scaleOutDuration + scaleInDuration;
     }
 
     private void SpawnEffect()
     {
-        Instantiate(explosionEffect, transform.position, Quaternion.identity);
+        ParticleSystem effect = Instantiate(explosionEffect, transform.position, Quaternion.identity);
+        Destroy(effect.gameObject, effect.main.duration + effect.main.startLifetime.constantMax);
+    }
+
+    public float DoAction(Cell cellPlaced)
+    {
+        cellPlaced.ClearContainObject();
+        return Explode();
     }
 }

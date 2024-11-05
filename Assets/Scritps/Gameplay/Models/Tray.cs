@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Tray : MonoBehaviour, IObject
 {
@@ -20,11 +21,20 @@ public class Tray : MonoBehaviour, IObject
     private List<Cell> cellInteractList = new List<Cell>();
 
     private List<ItemTraditional> itemTraditionalList = new List<ItemTraditional>();
-    
+    private readonly float MOVE_ITEM_DURATION = 0.5F;
+    private readonly float COMPLETE_DURATION = 0.5F;
+    private readonly float DESPAWN_DURATION = 0.3F;
+    private Cell cellPlaced;
+
     public void Init(int id)
     {
         this.id = id;
         positionStart = transform.position;
+    }
+
+    public void SetCellPlaced(Cell cellPlaced)
+    {
+        this.cellPlaced = cellPlaced;
     }
 
     public int NumberOfItem() => itemTraditionalList.Count;
@@ -48,9 +58,10 @@ public class Tray : MonoBehaviour, IObject
         return true;
     }
 
-    public LTSeq ShortAndMoveItemToPositionOrDespawn()
+    public float ShortAndMoveItemToPositionOrDespawn()
     {
         var sequence = LeanTween.sequence();
+        float timeMatch = 0;
 
         if (itemTraditionalList.Count > 0)
         {
@@ -68,12 +79,20 @@ public class Tray : MonoBehaviour, IObject
                     sequence.append(() => MoveItemToPosition(itemTraditionalList[index], points[index]));
                 }
             }
+
+            timeMatch += MOVE_ITEM_DURATION + .2f;
             sequence.append(1f);
             sequence.append(() =>
             {
                 if (IsMatch3ItemCompleted())
                 {
                     CompletedAndDespawn();
+
+                    float completeActionDuration = 0;
+                    completeActionDuration += DoAction(cellPlaced);
+                    completeActionDuration += COMPLETE_DURATION;
+
+                    timeMatch += completeActionDuration;
                 }
             });
         }
@@ -81,9 +100,9 @@ public class Tray : MonoBehaviour, IObject
         {
             sequence.append(.5f);
             sequence.append(() => Despawn());
+            timeMatch += DESPAWN_DURATION;
         }
-
-        return sequence;
+        return timeMatch;
     }
 
     public int CountItemsOfType(ItemType itemType)
@@ -105,7 +124,7 @@ public class Tray : MonoBehaviour, IObject
 
     private void MoveItemToPosition(ItemTraditional item, Transform pointPosition)
     {
-        LeanTween.move(item.gameObject, pointPosition.position, 0.5f).setEase(LeanTweenType.easeInOutQuad);
+        LeanTween.move(item.gameObject, pointPosition.position, MOVE_ITEM_DURATION).setEase(LeanTweenType.easeInOutQuad);
     }
 
     public void ClearItemTraditionalList()
@@ -242,9 +261,10 @@ public class Tray : MonoBehaviour, IObject
     }
 
     #endregion
-    public void DoAction()
+
+    public float DoAction()
     {
-        return;
+        return 0;
     }
 
     public LTSeq Despawn()
@@ -252,7 +272,7 @@ public class Tray : MonoBehaviour, IObject
         var sequence = LeanTween.sequence();
 
         sequence.append(
-            LeanTween.scale(gameObject, Vector3.zero, 0.5f)
+            LeanTween.scale(gameObject, Vector3.zero, DESPAWN_DURATION)
                 .setEase(LeanTweenType.easeInOutQuad)
         );
 
@@ -269,8 +289,13 @@ public class Tray : MonoBehaviour, IObject
     {
         var sequence = LeanTween.sequence();
 
+        TrayManager.Instance.OnCompletedMatchItem?.Invoke(this, new TrayManager.CompletedMatchItemEventArg
+        {
+            ItemType = itemTraditionalList[0].ItemType
+        });
+
         sequence.append(
-            LeanTween.scale(gameObject, Vector3.zero, 0.5f)
+            LeanTween.scale(gameObject, Vector3.zero, COMPLETE_DURATION)
                 .setEase(LeanTweenType.easeInOutQuad)
         );
 
@@ -279,9 +304,39 @@ public class Tray : MonoBehaviour, IObject
             MainGrid.Instance.ClearTrayInCell(this);
             Destroy(gameObject);
         });
-
         return sequence;
     }
 
-    private void DestroySelf() => Destroy(gameObject);
+    public float DoAction(Cell cellPlaced)
+    {
+        List<Cell> cellList = MainGrid.Instance.GetCellsHorizontal(cellPlaced);
+        cellList.AddRange(MainGrid.Instance.GetCellsVertical(cellPlaced));
+
+        Dictionary<ExplosiveBox, Cell> explosiveBoxDic = new Dictionary<ExplosiveBox, Cell>();
+        Dictionary<QuestionBox, Cell> questionBoxDic = new Dictionary<QuestionBox, Cell>();
+
+        foreach (var cell in cellList)
+        {
+            if (cell.GetContainObject() is ExplosiveBox explosiveBox)
+            {
+                explosiveBoxDic.Add(explosiveBox, cell);
+            }
+            else if(cell.GetContainObject() is QuestionBox questionBox)
+            {
+                questionBoxDic.Add(questionBox, cell);
+            }
+        }
+
+        float maxTimeAction = 0;
+        foreach (var boxCell in explosiveBoxDic)
+        {
+            maxTimeAction = Mathf.Max(maxTimeAction, boxCell.Key.DoAction(boxCell.Value));
+        }
+
+        foreach (var boxCell in questionBoxDic)
+        {
+            maxTimeAction = Mathf.Max(maxTimeAction, boxCell.Key.DoAction(boxCell.Value));
+        }
+        return maxTimeAction;
+    }
 }
