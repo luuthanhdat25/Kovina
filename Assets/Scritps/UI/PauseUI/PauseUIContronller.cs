@@ -38,6 +38,7 @@ public class PauseUIContronller : MonoBehaviour
         handleEvenUI.gameObject.SetActive(true);
         pauseItem.gameObject.SetActive(true);
         pauseButton.gameObject.SetActive(false);
+        UISingleton.Instance.OnOpenPauseUI.Invoke();
     }
 
     private void ClosePauseUI()
@@ -45,5 +46,6 @@ public class PauseUIContronller : MonoBehaviour
         pauseItem.gameObject.SetActive(false);
         pauseButton.gameObject.SetActive(true);
         handleEvenUI.gameObject.SetActive(false );
+        UISingleton.Instance.OnClosePauseUI.Invoke();
     }
 }
