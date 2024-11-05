@@ -13,7 +13,7 @@ public class SoundPooling : Singleton<SoundPooling>
     [SerializeField]
     private int maxPoolSize = 100;
 
-    public void CreateSound(SoundSo soundSO, float minRandomPitch, float maxRandomPitch)
+    public void CreateSound(SoundSO soundSO, float minRandomPitch, float maxRandomPitch)
     {
         if (!CanPlaySound(soundSO)) return;
         SoundEmitter soundEmitter = GetFromPool(soundSO);
@@ -33,12 +33,12 @@ public class SoundPooling : Singleton<SoundPooling>
             }
         }
     }
-    public bool CanPlaySound(SoundSo soundSO)
+    public bool CanPlaySound(SoundSO soundSO)
     {
         return soundEmitterPool.Count < maxPoolSize;
     }
 
-    private SoundEmitter GetFromPool(SoundSo soundSO)
+    private SoundEmitter GetFromPool(SoundSO soundSO)
     {
         foreach (var soundEmmit in soundEmitterPool)
         {

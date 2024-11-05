@@ -10,6 +10,6 @@ public class HandleEvenUI : MonoBehaviour
     public void OnPointerDownEven()
     {
         Debug.Log("is cancel pause ui");
-        OnCancelPause.Invoke();
+        GameManager.Instance.TogglePauseGame();
     }
 }

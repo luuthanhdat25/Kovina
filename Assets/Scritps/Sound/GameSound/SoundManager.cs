@@ -8,14 +8,14 @@ using UnityEngine.UI;
 public class SoundManager : Singleton<SoundManager>
 {
 
-    [SerializeField] private SoundSo menuBackgroundSound;
-    [SerializeField] private SoundSo clickSound;
-    [SerializeField] private SoundSo mergedSound;
-    [SerializeField] private SoundSo putDownSound;
-    [SerializeField] private SoundSo victorySound;
-    [SerializeField] private SoundSo lostSound;
-    [SerializeField] private SoundSo roadMapBackGroundSound;
-    [SerializeField] private SoundSo playingBackGroundSound;
+    [SerializeField] private SoundSO menuBackgroundSound;
+    [SerializeField] private SoundSO clickSound;
+    [SerializeField] private SoundSO mergedSound;
+    [SerializeField] private SoundSO putDownSound;
+    [SerializeField] private SoundSO victorySound;
+    [SerializeField] private SoundSO lostSound;
+    [SerializeField] private SoundSO roadMapBackGroundSound;
+    [SerializeField] private SoundSO playingBackGroundSound;
 
     private Button[] buttons;
     void Start()

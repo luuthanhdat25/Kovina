@@ -1,28 +1,19 @@
-using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 
-public class Cooldown : Singleton<Cooldown>
+public class CountdownUI : MonoBehaviour
 {
     [SerializeField] private TMP_Text textCooldown;
-    [SerializeField] private float totalTime = 30;
-
+    [SerializeField] private float timeCountDown = 180;
 
     private float remainTime;
     private bool isPaused = false; 
    
     void Start()
     {
-        remainTime = totalTime;
+        remainTime = timeCountDown;
         StartCoroutine(StartCountdown());
-        UISingleton.Instance.IsPauseEvent += OnPauseHandler_Event;
-    }
-
-    private void OnPauseHandler_Event(object sender, UISingleton.IsPauseEvent_Args e)
-    {
-        isPaused = e.isPause;
     }
     
     IEnumerator StartCountdown()
@@ -40,12 +31,7 @@ public class Cooldown : Singleton<Cooldown>
         remainTime = 0;
         UpdateTimerText();
         Debug.Log("Countdown finished!");
-        UISingleton.Instance.CallOnEndGame(2);
-    }
-
-    public void FreezeTime()
-    {
-        isPaused = !isPaused;
+        GameManager.Instance.GameOver();
     }
 
     void UpdateTimerText()

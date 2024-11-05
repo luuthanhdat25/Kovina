@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 847dbcab20e3ddb459e6671f0132608c, type: 3}
   m_Name: LostSound
   m_EditorClassIdentifier: 
-  AudioClip: {fileID: 0}
+  AudioClip: {fileID: 8300000, guid: a1343dcf893383848a828c21378fc8a7, type: 3}
   AudioMixerGroup: {fileID: -4450111728265100282, guid: 2939ab74d666e0b43abbe34cc8eabe94, type: 2}
   Volume: 1
   Loop: 0

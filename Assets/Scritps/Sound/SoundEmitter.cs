@@ -9,13 +9,13 @@ public class SoundEmitter : MonoBehaviour
     private AudioSource audioSource;
 
     private Coroutine playingCoroutine;
-    private SoundSo soundSO;
+    private SoundSO soundSO;
 
-    public SoundSo SoundSO => soundSO;
+    public SoundSO SoundSO => soundSO;
 
 
 
-    public SoundEmitter Initialize(SoundSo soundSO)
+    public SoundEmitter Initialize(SoundSO soundSO)
     {
         this.soundSO = soundSO;
         audioSource.volume = soundSO.Volume;
