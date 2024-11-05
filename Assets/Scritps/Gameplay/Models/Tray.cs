@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Tray : MonoBehaviour, IObject
 {
@@ -23,12 +24,17 @@ public class Tray : MonoBehaviour, IObject
     private readonly float MOVE_ITEM_DURATION = 0.5F;
     private readonly float COMPLETE_DURATION = 0.5F;
     private readonly float DESPAWN_DURATION = 0.3F;
-
+    private Cell cellPlaced;
 
     public void Init(int id)
     {
         this.id = id;
         positionStart = transform.position;
+    }
+
+    public void SetCellPlaced(Cell cellPlaced)
+    {
+        this.cellPlaced = cellPlaced;
     }
 
     public int NumberOfItem() => itemTraditionalList.Count;
@@ -75,15 +81,20 @@ public class Tray : MonoBehaviour, IObject
             }
 
             timeMatch += MOVE_ITEM_DURATION + .2f;
-            sequence.append(1f); 
+            sequence.append(1f);
             sequence.append(() =>
             {
                 if (IsMatch3ItemCompleted())
                 {
                     CompletedAndDespawn();
+
+                    float completeActionDuration = 0;
+                    completeActionDuration += DoAction(cellPlaced);
+                    completeActionDuration += COMPLETE_DURATION;
+
+                    timeMatch += completeActionDuration;
                 }
             });
-            timeMatch += COMPLETE_DURATION;
         }
         else
         {
@@ -250,9 +261,10 @@ public class Tray : MonoBehaviour, IObject
     }
 
     #endregion
-    public void DoAction()
+
+    public float DoAction()
     {
-        return;
+        return 0;
     }
 
     public LTSeq Despawn()
@@ -277,6 +289,8 @@ public class Tray : MonoBehaviour, IObject
     {
         var sequence = LeanTween.sequence();
 
+        
+
         sequence.append(
             LeanTween.scale(gameObject, Vector3.zero, COMPLETE_DURATION)
                 .setEase(LeanTweenType.easeInOutQuad)
@@ -291,5 +305,36 @@ public class Tray : MonoBehaviour, IObject
         return sequence;
     }
 
-    private void DestroySelf() => Destroy(gameObject);
+    public float DoAction(Cell cellPlaced)
+    {
+        List<Cell> cellList = MainGrid.Instance.GetCellsHorizontal(cellPlaced);
+        cellList.AddRange(MainGrid.Instance.GetCellsVertical(cellPlaced));
+
+        Dictionary<ExplosiveBox, Cell> explosiveBoxDic = new Dictionary<ExplosiveBox, Cell>();
+        Dictionary<QuestionBox, Cell> questionBoxDic = new Dictionary<QuestionBox, Cell>();
+
+        foreach (var cell in cellList)
+        {
+            if (cell.GetContainObject() is ExplosiveBox explosiveBox)
+            {
+                explosiveBoxDic.Add(explosiveBox, cell);
+            }
+            else if(cell.GetContainObject() is QuestionBox questionBox)
+            {
+                questionBoxDic.Add(questionBox, cell);
+            }
+        }
+
+        float maxTimeAction = 0;
+        foreach (var boxCell in explosiveBoxDic)
+        {
+            maxTimeAction = Mathf.Max(maxTimeAction, boxCell.Key.DoAction(boxCell.Value));
+        }
+
+        foreach (var boxCell in questionBoxDic)
+        {
+            maxTimeAction = Mathf.Max(maxTimeAction, boxCell.Key.DoAction(boxCell.Value));
+        }
+        return maxTimeAction;
+    }
 }

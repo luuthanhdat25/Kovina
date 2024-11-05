@@ -44,7 +44,7 @@ public class TrayManager : Singleton<TrayManager>
         OnEnoughTrayPlaced -= SpawnUnplacedTraies;
     }
 
-    public void OnTrayPlaced(Tray trayComponent, Cell cellPlaced)
+    public void OnTrayPlaced(Tray trayPlaced, Cell cellPlaced)
     {
         countTrayPlaced = countTrayPlaced + 1;
         if (countTrayPlaced >= TRAY_UI_MAXIMUM)
@@ -53,14 +53,7 @@ public class TrayManager : Singleton<TrayManager>
             OnEnoughTrayPlaced?.Invoke();
             trayUIContainer.OnEnableTraysUI();
         }
-
-        //Debug.Log($"Placed Tray {trayComponent.name} in {cellPlaced.name}");
-        Tray trayCenter;
-        if (cellPlaced.GetContainObject() is Tray tray)
-        {
-            trayCenter = tray;
-        }
-        else return;
+        trayPlaced.SetCellPlaced(cellPlaced);
 
         // Do Algorithm
         List<Cell> cellsHoriList = MainGrid.Instance.GetCellsHorizontal(cellPlaced);
@@ -78,16 +71,16 @@ public class TrayManager : Singleton<TrayManager>
         if (trayHoriList.Count + trayVertiList.Count == 1) // 2 Tray (Hori or Verti)
         {
             trayHoriList.AddRange(trayVertiList);
-            timeMatch += Match2Tray(trayCenter, trayHoriList[0], true);
+            timeMatch += Match2Tray(trayPlaced, trayHoriList[0], true);
         }
         else if ((trayHoriList.Count == 0 && trayVertiList.Count > 1) || (trayHoriList.Count > 1 && trayVertiList.Count == 0)) //3 tray (Hori or Verti) 
         {
             trayHoriList.AddRange(trayVertiList);
-            timeMatch += Match3Tray(trayCenter, trayHoriList);
+            timeMatch += Match3Tray(trayPlaced, trayHoriList);
         }
         else // >3 Tray (Hori and Verti)
         {
-            timeMatch += MatchTrayPlus(trayCenter, trayHoriList, trayVertiList);
+            timeMatch += MatchTrayPlus(trayPlaced, trayHoriList, trayVertiList);
         }
         Debug.Log("[TrayManager]Delay time: " + timeMatch);
         StartCoroutine(WaitForMatchCompleted(timeMatch));

@@ -117,7 +117,6 @@ public class MainGrid : Singleton<MainGrid>
                             ExplosiveBox explosiveBox = Instantiate(explosiveBoxPrefab, transform);
                             iObject = explosiveBox;
                             explosiveBox.transform.position = cellArray[box.XPosition, box.YPosition].transform.position;
-                            explosiveBox.SetCellPlace(cell);
                             break;
                     }
                     cell.SetContainObject(iObject);
