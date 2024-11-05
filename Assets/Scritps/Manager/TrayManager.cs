@@ -25,6 +25,14 @@ public class TrayManager : Singleton<TrayManager>
     private bool canAddTray = true;
     public bool CanAddTray => canAddTray;
 
+    //Dat Add
+    public class CompletedMatchItemEventArg : EventArgs
+    {
+        public ItemType ItemType;
+    }
+
+    public EventHandler<CompletedMatchItemEventArg> OnCompletedMatchItem;
+
     private void Start() => SpawnUnplacedTraies();
 
     private void OnEnable() => RegisterListenEvent_EnoughTrayPlaced();
@@ -44,6 +52,7 @@ public class TrayManager : Singleton<TrayManager>
         OnEnoughTrayPlaced -= SpawnUnplacedTraies;
     }
 
+    #region Tray Match Algorithm
     public void OnTrayPlaced(Tray trayPlaced, Cell cellPlaced)
     {
         countTrayPlaced = countTrayPlaced + 1;
@@ -513,7 +522,6 @@ public class TrayManager : Singleton<TrayManager>
         return (mostFrequent, maxCount);
     }
 
-
     private List<Tray> GetTrayListFromCellList(List<Cell> cellList)
     {
         List<Tray> trayList = new List<Tray>();
@@ -571,7 +579,7 @@ public class TrayManager : Singleton<TrayManager>
         }
         return trayListMath;
     }
-
+    #endregion
 
     private void SpawnUnplacedTraies()
     {
@@ -622,6 +630,54 @@ public class TrayManager : Singleton<TrayManager>
         trayUIContainer.SetItemImageForTrayUI(itemTypes, index);
     }
 
+    //Dat Add
+    public Tray CreatePlacedTray(Cell cellPlace)
+    {
+        Transform newTray = Instantiate(trayPrefab, cellPlace.transform.position, Quaternion.identity);
+        if (newTray == null || newTray.GetComponent<Tray>() == null)
+        {
+            Debug.LogWarning("Developer, please check the prefab configuration & ensure it has a Tray component attached.");
+            Debug.LogWarning("TrayManager: trayPrefab don't have Tray component to add |FAIL|");
+            return null;
+        }
+
+        Tray trayComponent = newTray.GetComponent<Tray>();
+        CreateItemOnTray(trayComponent);
+        trayComponent.SetCellPlaced(cellPlace);
+        cellPlace.SetContainObject(trayComponent);
+        return trayComponent;
+    }
+
+    //Dat Add
+    private void CreateItemOnTray(Tray trayComponent)
+    {
+        var points = trayComponent.Points;
+        var itemTypes = new List<ItemType>();
+        trayComponent.ClearItemTraditionalList();
+
+        int numberOffItemOnTray = UnityEngine.Random.Range(2, 4); // Random number of items on Tray
+
+        for (int i = 0; numberOffItemOnTray > 0; i++, numberOffItemOnTray--)
+        {
+            ItemType itemType;
+
+            do
+            {
+                itemType = ItemTraditionalManager.Instance.Spawner.GetRandomEnumValue();
+            } while (itemTypes.Count >= 2 && itemTypes[itemTypes.Count - 1] == itemType && itemTypes[itemTypes.Count - 2] == itemType);
+
+            var item = ItemTraditionalManager.Instance.Spawner.Spawn(itemType);
+            trayComponent.AddItem(item);
+
+            item.transform.SetParent(trayComponent.transform);
+            item.transform.position = points[i].position;
+            item.transform.localScale = points[i].localScale;
+
+            itemTypes.Add(itemType);
+        }
+
+        itemTypes.Sort((itemA, itemB) => itemA.CompareTo(itemB));
+    }
 
     #region CRUD
 

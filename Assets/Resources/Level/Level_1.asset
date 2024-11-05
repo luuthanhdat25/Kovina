@@ -10,17 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 95860ea997dae224bb7c6220e8fb1c22, type: 3}
-  m_Name: Level_Grid_1
+  m_Name: Level_1
   m_EditorClassIdentifier: 
-  widthSize: 4
-  heightSize: 4
-  boxSetUps:
-  - Type: 0
-    XPosition: 0
-    YPosition: 0
-  - Type: 0
-    XPosition: 2
-    YPosition: 2
-  - Type: 0
-    XPosition: 3
-    YPosition: 2
+  itemSetUp:
+  - ItemType: 0
+    Number: 6
+  - ItemType: 1
+    Number: 6
+  widthSize: 3
+  heightSize: 3
+  boxSetUps: []

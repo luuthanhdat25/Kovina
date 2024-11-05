@@ -289,7 +289,10 @@ public class Tray : MonoBehaviour, IObject
     {
         var sequence = LeanTween.sequence();
 
-        
+        TrayManager.Instance.OnCompletedMatchItem?.Invoke(this, new TrayManager.CompletedMatchItemEventArg
+        {
+            ItemType = itemTraditionalList[0].ItemType
+        });
 
         sequence.append(
             LeanTween.scale(gameObject, Vector3.zero, COMPLETE_DURATION)
@@ -301,7 +304,6 @@ public class Tray : MonoBehaviour, IObject
             MainGrid.Instance.ClearTrayInCell(this);
             Destroy(gameObject);
         });
-
         return sequence;
     }
 

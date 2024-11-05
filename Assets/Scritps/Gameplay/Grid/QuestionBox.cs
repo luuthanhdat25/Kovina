@@ -39,8 +39,8 @@ public class QuestionBox : MonoBehaviour, IObject
 
     public float DoAction(Cell cellPlaced)
     {
-        //Tray trayComponent = TrayManager.Instance.GetTraUnplace(index);
-        //TrayManager.Instance.OnTrayPlaced(trayComponent, cellPlaced);
+        Debug.Log("Cell Place new Tray: " + cellPlaced.name);
+        TrayManager.Instance.CreatePlacedTray(cellPlaced);
         return DoAnimation();
     }
 }
