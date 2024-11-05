@@ -20,7 +20,11 @@ public class Tray : MonoBehaviour, IObject
     private List<Cell> cellInteractList = new List<Cell>();
 
     private List<ItemTraditional> itemTraditionalList = new List<ItemTraditional>();
-    
+    private readonly float MOVE_ITEM_DURATION = 0.5F;
+    private readonly float COMPLETE_DURATION = 0.5F;
+    private readonly float DESPAWN_DURATION = 0.3F;
+
+
     public void Init(int id)
     {
         this.id = id;
@@ -48,9 +52,10 @@ public class Tray : MonoBehaviour, IObject
         return true;
     }
 
-    public LTSeq ShortAndMoveItemToPositionOrDespawn()
+    public float ShortAndMoveItemToPositionOrDespawn()
     {
         var sequence = LeanTween.sequence();
+        float timeMatch = 0;
 
         if (itemTraditionalList.Count > 0)
         {
@@ -68,7 +73,9 @@ public class Tray : MonoBehaviour, IObject
                     sequence.append(() => MoveItemToPosition(itemTraditionalList[index], points[index]));
                 }
             }
-            sequence.append(1f);
+
+            timeMatch += MOVE_ITEM_DURATION + .2f;
+            sequence.append(1f); 
             sequence.append(() =>
             {
                 if (IsMatch3ItemCompleted())
@@ -76,14 +83,15 @@ public class Tray : MonoBehaviour, IObject
                     CompletedAndDespawn();
                 }
             });
+            timeMatch += COMPLETE_DURATION;
         }
         else
         {
             sequence.append(.5f);
             sequence.append(() => Despawn());
+            timeMatch += DESPAWN_DURATION;
         }
-
-        return sequence;
+        return timeMatch;
     }
 
     public int CountItemsOfType(ItemType itemType)
@@ -105,7 +113,7 @@ public class Tray : MonoBehaviour, IObject
 
     private void MoveItemToPosition(ItemTraditional item, Transform pointPosition)
     {
-        LeanTween.move(item.gameObject, pointPosition.position, 0.5f).setEase(LeanTweenType.easeInOutQuad);
+        LeanTween.move(item.gameObject, pointPosition.position, MOVE_ITEM_DURATION).setEase(LeanTweenType.easeInOutQuad);
     }
 
     public void ClearItemTraditionalList()
@@ -252,7 +260,7 @@ public class Tray : MonoBehaviour, IObject
         var sequence = LeanTween.sequence();
 
         sequence.append(
-            LeanTween.scale(gameObject, Vector3.zero, 0.5f)
+            LeanTween.scale(gameObject, Vector3.zero, DESPAWN_DURATION)
                 .setEase(LeanTweenType.easeInOutQuad)
         );
 
@@ -270,7 +278,7 @@ public class Tray : MonoBehaviour, IObject
         var sequence = LeanTween.sequence();
 
         sequence.append(
-            LeanTween.scale(gameObject, Vector3.zero, 0.5f)
+            LeanTween.scale(gameObject, Vector3.zero, COMPLETE_DURATION)
                 .setEase(LeanTweenType.easeInOutQuad)
         );
 
