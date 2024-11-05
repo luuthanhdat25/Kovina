@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class UINavigator : MonoBehaviour
@@ -7,8 +8,9 @@ public class UINavigator : MonoBehaviour
     public GameObject bar;
     public int timeProcess;
 
-    public GameObject currentScene;
-    private GameObject intoScene;
+    public GameObject currentUI;
+    private GameObject intoUI;
+    private GameObject settingUI;
     private UIEvenHandler controller = new UIEvenHandler();
 
     [SerializeField]
@@ -16,18 +18,21 @@ public class UINavigator : MonoBehaviour
 
     private void Start()
     {
-        animateBar();
-        intoScene = GameObject.Find("MenuPage");
-        intoScene.SetActive(false);
+        AnimateBar();
+        intoUI = GameObject.Find("MenuPage");
+        settingUI = GameObject.Find("Panel_settingWindow");
+        intoUI.SetActive(false);
+        settingUI.SetActive(false);
     }
-    public void animateBar()
+    public void AnimateBar()
     {
-        LeanTween.scaleX(bar, 10.04f, timeProcess).setOnComplete(PlayMenu);
+        LeanTween.scaleX(bar, 10f, timeProcess).setOnComplete(PlayMenu);
     }
     public void PlayMenu()
     {
-        controller.ChangUIApearence(currentScene,intoScene);
+        StartCoroutine(controller.ChangUIApearence(currentUI, intoUI));
         _uIController.SetTriggerAnimation();
     }
+    
 
 }

@@ -1,0 +1,60 @@
+{
+    "MenuText": {
+        "Play": {
+            "English": "Play",
+            "Vietnamese": "Chơi",
+            "Korean": ""
+        },
+        "Credit": {
+            "English": "Credits",
+            "Vietnamese": "Giới thiệu",
+            "Korean": "신용"
+        },
+        "Exit": {
+            "English": "Exit",
+            "Vietnamese": "Thoát",
+            "Korean": "출구"
+        }
+    },
+    "SettingText": {
+        "Vietnamese": {
+            "Display": {
+                "English": "Vietnamese",
+                "Vietnamese": "Tiếng Việt",
+                "Korean": "베트남어"
+            }
+        },
+        "English": {
+            "Display": {
+                "English": "English",
+                "Vietnamese": "Tiếng Anh",
+                "Korean": "영어"
+            }
+        },
+        "Korean": {
+            "Display": {
+                "English": "Korean",
+                "Vietnamese": "Tiếng Hàn",
+                "Korean": "한국어"
+            }
+        }
+    },
+    "PauseData": {
+        "Continue": {
+            "English": "Continue",
+            "Vietnamese": "Tiếp tục",
+            "Korean": "계속"
+        },
+        "BackToMenu": {
+            "English": "Back to Menu",
+            "Vietnamese": "Quay lại Menu",
+            "Korean": "메뉴로 돌아가기"
+        },
+        "BackToRoadMap": {
+            "English": "Back to RoadMap",
+            "Vietnamese": "Quay lại RoadMap",
+            "Korean": "로드맵으로 돌아가기"
+        }
+    },
+    "CurrentLanguage": "Vietnamese"
+}
