@@ -502,6 +502,7 @@ public class TrayManager : Singleton<TrayManager>
         {
             return 0;
         }
+        SoundManager.Instance.PlayMergeSound();
     }
 
     private (ItemType, int count) GetMostFrequentItemType(List<ItemTraditional> sortedItemList)

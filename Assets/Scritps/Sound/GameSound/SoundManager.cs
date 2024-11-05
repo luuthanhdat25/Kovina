@@ -13,6 +13,7 @@ public class SoundManager : Singleton<SoundManager>
     [SerializeField] private SoundSo mergedSound;
     [SerializeField] private SoundSo putDownSound;
     [SerializeField] private SoundSo victorySound;
+    [SerializeField] private SoundSo lostSound;
     [SerializeField] private SoundSo roadMapBackGroundSound;
     [SerializeField] private SoundSo playingBackGroundSound;
 
@@ -47,6 +48,14 @@ public class SoundManager : Singleton<SoundManager>
             PlayMenuBackgroundSound();
         }
     }
+
+
+    public void PlayLostSound()
+    {
+        Debug.Log("Play Lost Sound");
+        SoundPooling.Instance.CreateSound(lostSound,0,0);
+    }
+
     public void PlayClickButton()
     {
         Debug.Log("Play Click Sound");
@@ -67,7 +76,7 @@ public class SoundManager : Singleton<SoundManager>
 
     public void PlayVictorySound()
     {
-        Debug.Log("play put down sound");
+        Debug.Log("play Victory sound");
         SoundPooling.Instance.CreateSound (victorySound, 0,0);
     }
 
