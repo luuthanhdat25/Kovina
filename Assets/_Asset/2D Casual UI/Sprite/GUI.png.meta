@@ -536,7 +536,7 @@ TextureImporter:
         height: 132
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 25, y: 21, z: 31, w: 17}
+      border: {x: 3, y: 21, z: 0, w: 17}
       outline: []
       physicsShape: []
       tessellationDetail: 0
@@ -551,10 +551,10 @@ TextureImporter:
       name: GUI_12
       rect:
         serializedVersion: 2
-        x: 2604
+        x: 2606
         y: 1673
-        width: 256
-        height: 61
+        width: 249
+        height: 60
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 29, y: 20, z: 31, w: 20}
@@ -656,13 +656,13 @@ TextureImporter:
       name: GUI_17
       rect:
         serializedVersion: 2
-        x: 1789
-        y: 1462
-        width: 376
-        height: 139
+        x: 1788
+        y: 1463
+        width: 392
+        height: 138
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 23, y: 50, z: 0, w: 50}
+      border: {x: 0, y: 50, z: 0, w: 50}
       outline: []
       physicsShape: []
       tessellationDetail: 0
@@ -698,13 +698,13 @@ TextureImporter:
       name: GUI_19
       rect:
         serializedVersion: 2
-        x: 2599
+        x: 2605
         y: 1537
-        width: 312
-        height: 53
+        width: 301
+        height: 51
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 40, y: 0, z: 40, w: 0}
+      border: {x: 15, y: 12, z: 14, w: 11}
       outline: []
       physicsShape: []
       tessellationDetail: 0

@@ -453,6 +453,7 @@ public class TrayManager : Singleton<TrayManager>
             tray1.ShortAndMoveItemToPositionOrDespawn();
             tray2.ShortAndMoveItemToPositionOrDespawn();
         }
+        SoundManager.Instance.PlayMergeSound();
     }
 
     private (ItemType, int count) GetMostFrequentItemType(List<ItemTraditional> sortedItemList)

@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class UIEvenHandler
 {
-    public void ChangUIApearence(GameObject currentScene, GameObject intoScene)
+   
+    public IEnumerator ChangUIApearence(GameObject currentScene, GameObject intoScene)
     {
+        yield return new WaitForSeconds(0.2f);
         currentScene.SetActive(false);
         intoScene.SetActive(true);
     }
