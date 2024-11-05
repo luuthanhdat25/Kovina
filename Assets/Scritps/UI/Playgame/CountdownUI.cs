@@ -1,37 +1,34 @@
-using System.Collections;
 using TMPro;
 using UnityEngine;
 
 public class CountdownUI : MonoBehaviour
 {
     [SerializeField] private TMP_Text textCooldown;
-    [SerializeField] private float timeCountDown = 180;
+    [SerializeField] private float timeCountDown = 180f;
 
     private float remainTime;
-    private bool isPaused = false; 
-   
+    private bool isPaused = false;
+
     void Start()
     {
         remainTime = timeCountDown;
-        StartCoroutine(StartCountdown());
+        UpdateTimerText(); // Initialize with starting time
     }
-    
-    IEnumerator StartCountdown()
-    {
-        while (remainTime > 0)
-        {
-            if (!isPaused)
-            {
-                UpdateTimerText();
-                remainTime -= 1f;
-            }
-            yield return new WaitForSeconds(1f);
-        }
 
-        remainTime = 0;
-        UpdateTimerText();
-        Debug.Log("Countdown finished!");
-        GameManager.Instance.GameOver();
+    void FixedUpdate()
+    {
+        if (!GameManager.Instance.IsGamePlaying()) return;
+        if (!isPaused && remainTime > 0)
+        {
+            remainTime -= Time.fixedDeltaTime;
+            if (remainTime <= 0)
+            {
+                remainTime = 0;
+                Debug.Log("Countdown finished!");
+                GameManager.Instance.GameOver();
+            }
+            UpdateTimerText();
+        }
     }
 
     void UpdateTimerText()

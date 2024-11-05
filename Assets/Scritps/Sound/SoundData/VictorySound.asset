@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 847dbcab20e3ddb459e6671f0132608c, type: 3}
   m_Name: VictorySound
   m_EditorClassIdentifier: 
-  AudioClip: {fileID: 8300000, guid: b73af56bc8d371c40ae7930df9f685b3, type: 3}
+  AudioClip: {fileID: 8300000, guid: afef5f3a9d169314ba8e81c81895b62b, type: 3}
   AudioMixerGroup: {fileID: -4450111728265100282, guid: 2939ab74d666e0b43abbe34cc8eabe94, type: 2}
   Volume: 1
   Loop: 0

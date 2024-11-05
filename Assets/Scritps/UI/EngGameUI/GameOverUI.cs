@@ -1,13 +1,13 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameOverUI : MonoBehaviour
 {
-    [SerializeField] private int starNo;
-
     [SerializeField] private GameObject[] star;
     [SerializeField] private GameObject endGameUI;
     [SerializeField] GameObject Victory;
@@ -15,25 +15,28 @@ public class GameOverUI : MonoBehaviour
     [SerializeField] GameObject ButtonContainer;
     [SerializeField] Button backToRoadMap;
     [SerializeField] Button replayButton;
+    [SerializeField] RectTransform backBackground;
+    private Vector2 startSize;
+
 
     void Start()
     {
         backToRoadMap.onClick.AddListener(() => { SceneManager.LoadScene(SceneEnum.Roadmap.ToString()); });
+        endGameUI.SetActive(false);
+        startSize = endGameUI.transform.localScale;
     }
-    public void SetStarNo(int numberStar)
+ 
+    public void InitializeEndGameUI(int starNo)
     {
-        this.starNo = numberStar;
-       
-    }
-    public void InitializeEndGameUI()
-    {
-        
-        Debug.Log($"star number {this.starNo}");
+        endGameUI.gameObject.SetActive(true);
+        backBackground.gameObject.SetActive(true);
+        Debug.Log($"star number {starNo}");
         endGameUI.transform.localScale = Vector3.zero;
         ButtonContainer.transform.localScale = Vector3.zero;
         Victory.SetActive(false);
         Lost.SetActive(false);
-        PlayEndGameUI();
+        
+        PlayEndGameUI(starNo);
         if (starNo > 0)
         {
             SoundManager.Instance.PlayVictorySound();
@@ -46,7 +49,7 @@ public class GameOverUI : MonoBehaviour
         }
     }
 
-    private void ShowStar()
+    private void ShowStar(int starNo)
     {
         var sequence = LeanTween.sequence();
         for (int i = 0; i < starNo; i++)
@@ -69,12 +72,12 @@ public class GameOverUI : MonoBehaviour
         LeanTween.scale(ButtonContainer, new Vector3(1.75f, 1.75f, 1.75f), 0.5f);
     }
 
-    private void PlayEndGameUI()
+    private void PlayEndGameUI(int starNo)
     {
-        LeanTween.scale(endGameUI, new Vector3(0.3f, 0.3f, 0.3f), 0.5f)
+        LeanTween.scale(endGameUI, startSize, 0.5f)
             .setOnComplete(() =>
             {
-                LeanTween.delayedCall(0.2f, () => ShowStar());
+                LeanTween.delayedCall(0.2f, () => ShowStar(starNo));
             });
     }
 }

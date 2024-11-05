@@ -68,6 +68,27 @@ public class TargetProcessUI : MonoBehaviour
         }
     }
 
+    public int GetCurrentStars()
+    {
+        float currentValue = processSlider.value;
+        int starCount = 0;
+
+        for (int i = 0; i < starMilestones.Length; i++)
+        {
+            if (currentValue >= starMilestones[i])
+            {
+                starCount++;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return starCount;
+    }
+
+
     private void SetTargetProcessBar()
     {
         itemSetUps = LoadItemSetup();
@@ -142,6 +163,7 @@ public class TargetProcessUI : MonoBehaviour
                     if (value == 1)
                     {
                         starProcessUIs[2].ShowItem();
+                        GameManager.Instance.GameOver();
                     }
                     else if (value > 2f / 3f)
                     {

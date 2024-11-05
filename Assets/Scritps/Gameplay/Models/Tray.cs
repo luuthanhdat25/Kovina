@@ -80,7 +80,7 @@ public class Tray : MonoBehaviour, IObject
                 }
             }
 
-            timeMatch += MOVE_ITEM_DURATION + .2f;
+            timeMatch += MOVE_ITEM_DURATION + 1f;
             sequence.append(1f);
             sequence.append(() =>
             {

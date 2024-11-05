@@ -8,15 +8,6 @@ public class GameManager : Singleton<GameManager>
     public event Action OnGamePaused;
     public event Action OnGameUnpaused;
 
-    [SerializeField]
-    private SoundSO winGameSoundSO;
-
-    [SerializeField]
-    private SoundSO loseGameSoundSO;
-
-    [SerializeField]
-    private SoundSO gameMusicBackgroundSO;
-
     public class OnStateChangedEventArgs : EventArgs
     {
         public GameState NewGameState;
@@ -75,13 +66,10 @@ public class GameManager : Singleton<GameManager>
     public void GameOver()
     {
         SoundPooling.Instance.StopAll();
-        bool isWin = true; // Get sao
-        SoundSO playSound = isWin ? winGameSoundSO : loseGameSoundSO;
-        //SoundPooling.Instance.CreateSound(playSound, PlayerPublicInfor.Instance.Position, 0, 0);
-
-        //UIManager.Instance.GameOverUI.Show(isWin);
+        int starResult = UIManager.Instance.TargetProcessUI.GetCurrentStars();
+        UIManager.Instance.GameOverUI.InitializeEndGameUI(starResult);
         ChangeState(GameState.GameOver);
-        Time.timeScale = 0;
+        //Time.timeScale = 0;
     }
 
     public void PlayAgain() => SceneManager.LoadScene(SceneManager.GetActiveScene().name);

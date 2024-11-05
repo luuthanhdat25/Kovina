@@ -42,7 +42,7 @@ public class TrayUI : DraggableUI
 
     public override void OnBeginDrag(PointerEventData eventData)
     {
-        if (isPlaySequence || !TrayManager.Instance.CanAddTray)
+        if (isPlaySequence || !TrayManager.Instance.CanAddTray || !GameManager.Instance.IsGamePlaying())
         {
             canDraging = false;
         }
@@ -55,7 +55,7 @@ public class TrayUI : DraggableUI
 
     public override void OnDrag(PointerEventData eventData)
     {
-        if (isPlaySequence || !TrayManager.Instance.CanAddTray || !canDraging) return;
+        if (isPlaySequence || !TrayManager.Instance.CanAddTray || !canDraging || !GameManager.Instance.IsGamePlaying()) return;
         base.OnDrag(eventData);
        
         if (IsOutsideBounds()) DisableTrayUI(eventData);
@@ -120,7 +120,7 @@ public class TrayUI : DraggableUI
 
     public override void OnEndDrag(PointerEventData eventData)
     {
-        if (isPlaySequence || !TrayManager.Instance.CanAddTray || !canDraging) return;
+        if (isPlaySequence || !TrayManager.Instance.CanAddTray || !canDraging || !GameManager.Instance.IsGamePlaying()) return;
         base.OnEndDrag(eventData);
 
         canvasGroup.alpha = 1f;

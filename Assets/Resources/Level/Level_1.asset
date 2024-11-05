@@ -17,6 +17,8 @@ MonoBehaviour:
     Number: 6
   - ItemType: 1
     Number: 6
+  - ItemType: 2
+    Number: 6
   widthSize: 3
   heightSize: 3
   boxSetUps: []

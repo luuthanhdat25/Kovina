@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AudioClip: {fileID: 8300000, guid: b73af56bc8d371c40ae7930df9f685b3, type: 3}
   AudioMixerGroup: {fileID: -971667190475061649, guid: 2939ab74d666e0b43abbe34cc8eabe94, type: 2}
-  Volume: 1
+  Volume: 0.5
   Loop: 1
   PlayOnAwake: 1
   FrequentSound: 0
