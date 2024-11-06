@@ -7,9 +7,6 @@ public class MainGrid : Singleton<MainGrid>
     private Cell cellPrefab;
 
     [SerializeField]
-    private string levelLoadPath = "Level/Level_";
-
-    [SerializeField]
     private int levelNumber;
 
     [Header("[Cell Padding]")]
@@ -32,27 +29,10 @@ public class MainGrid : Singleton<MainGrid>
     private int widthSize;
     private int heightSize;
 
-    void Start()
+    private void Start()
     {
-        LoadScene loadLevel = LoadScene.Instance;
-        if (loadLevel != null)
-        {
-            levelNumber = loadLevel.Level <= 0 ? 1 : loadLevel.Level;
-        }
-        else
-        {
-            levelNumber = 1;
-        }
-
-        LevelSetUpSO levelGridData = Resources.Load<LevelSetUpSO>(levelLoadPath + levelNumber);
-        if(levelGridData != null)
-        {
-            InitialGrid(levelGridData);
-        }
-        else
-        {
-            Debug.LogWarning("[MainGrid] " + "File" + levelLoadPath + levelNumber + " doesn't exist!");
-        }
+        LevelSetUpSO levelGridData = LoadScene.Instance.LevelSetUpSO;
+        InitialGrid(levelGridData);
     }
 
     private void InitialGrid(LevelSetUpSO levelGridSO)

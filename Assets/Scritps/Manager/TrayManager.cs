@@ -508,7 +508,6 @@ public class TrayManager : Singleton<TrayManager>
         {
             return 0;
         }
-        SoundManager.Instance.PlayMergeSound();
     }
 
     private (ItemType, int count) GetMostFrequentItemType(List<ItemTraditional> sortedItemList)
@@ -717,7 +716,7 @@ public class TrayManager : Singleton<TrayManager>
         }
 
         trayUnplaced.Add(trayComponent);
-        Debug.Log($"TrayManager: add {trayComponent} element to trayUnplaced |SUCCESS|");
+        //Debug.Log($"TrayManager: add {trayComponent} element to trayUnplaced |SUCCESS|");
     }
 
     private void AddNewTrayToPlaced(int index)

@@ -13,18 +13,28 @@ public class GameOverUI : MonoBehaviour
     [SerializeField] GameObject Lost;
     [SerializeField] GameObject ButtonContainer;
     [SerializeField] Button backToRoadMap;
+    [SerializeField] Button nextLevel;
     [SerializeField] Button replayButton;
     [SerializeField] RectTransform backBackground;
     private Vector2 startSize;
-
 
     void Start()
     {
         backToRoadMap.onClick.AddListener(() => { SceneManager.LoadScene(SceneEnum.Roadmap.ToString()); });
         endGameUI.SetActive(false);
         startSize = endGameUI.transform.localScale;
+
+        int numberOfLevel = LoadScene.Instance.LevelNumber;
+        if (numberOfLevel == 16)
+        {
+            nextLevel.gameObject.SetActive(false);
+        }
+        else
+        {
+            nextLevel.onClick.AddListener(() => LoadScene.Instance.LoadLevel(numberOfLevel + 1));
+        }
     }
- 
+
     public void InitializeEndGameUI(int starNo)
     {
         endGameUI.gameObject.SetActive(true);
@@ -45,6 +55,34 @@ public class GameOverUI : MonoBehaviour
         {
             SoundManager.Instance.PlayLostSound();
             Lost.SetActive(true);
+        }
+
+        SaveResult(starNo);
+    }
+
+    private void SaveResult(int starNo)
+    {
+        if (starNo <= 0) return;
+
+        LevelRepository levelRepository = LoadScene.Instance.LevelRepository;
+        Level level = levelRepository.GetLevelByLevelNumber(starNo);
+        
+        if(level == null)
+        {
+            Level newLevel = new Level
+            {
+                NumberLevel = LoadScene.Instance.LevelNumber,
+                NumberStar = starNo
+            };
+            levelRepository.SaveLevel(newLevel);
+        }
+        else
+        {
+            if(starNo > level.NumberStar)
+            {
+                level.NumberStar = starNo;
+                levelRepository.SaveLevel(level);
+            }
         }
     }
 

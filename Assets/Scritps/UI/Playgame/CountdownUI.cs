@@ -4,23 +4,25 @@ using UnityEngine;
 public class CountdownUI : MonoBehaviour
 {
     [SerializeField] private TMP_Text textCooldown;
-    [SerializeField] private float timeCountDown = 180f;
 
     private float remainTime;
-    private bool isPaused = false;
 
     void Start()
     {
-        remainTime = timeCountDown;
+        remainTime = LoadScene.Instance.LevelSetUpSO.TimePlay;
         UpdateTimerText(); // Initialize with starting time
+        StartCoroutine(StartCountdownAfterDelay(1f)); // Start countdown with a 1-second delay
     }
 
-    void FixedUpdate()
+    private System.Collections.IEnumerator StartCountdownAfterDelay(float delay)
     {
-        if (!GameManager.Instance.IsGamePlaying()) return;
-        if (!isPaused && remainTime > 0)
+        yield return new WaitForSeconds(delay);
+
+        while (remainTime > 0)
         {
-            remainTime -= Time.fixedDeltaTime;
+            if (!GameManager.Instance.IsGamePlaying()) yield return null;
+
+            remainTime -= Time.deltaTime;
             if (remainTime <= 0)
             {
                 remainTime = 0;
@@ -28,6 +30,7 @@ public class CountdownUI : MonoBehaviour
                 GameManager.Instance.GameOver();
             }
             UpdateTimerText();
+            yield return null; // Wait until the next frame
         }
     }
 

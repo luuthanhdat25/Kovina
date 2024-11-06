@@ -28,7 +28,10 @@ public class PauseUI : Singleton<MonoBehaviour>
     {
         pauseMenu.gameObject.SetActive(false);
         continuteButton.onClick.AddListener(TogglePauseGame);
-        backToRoadMap.onClick.AddListener(() => LoadScene.Instance.LoadRoadmap());
+        backToRoadMap.onClick.AddListener(() => {
+            Time.timeScale = 1;
+            LoadScene.Instance.LoadRoadmap();
+        } );
     }
 
     public void TogglePauseGame()

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -6,9 +5,6 @@ using UnityEngine.UI;
 
 public class TargetProcessUI : MonoBehaviour
 {
-    [SerializeField]
-    private string levelLoadPath = "Level/Level_";
-
     [SerializeField]
     private TargetIconUI templateTargetIconUI;
 
@@ -37,7 +33,6 @@ public class TargetProcessUI : MonoBehaviour
     {
         RectTransform fillArea = processSlider.GetComponent<RectTransform>();
         float sliderHeight = fillArea.rect.height;
-        float distance = sliderHeight / 3;
 
         float startY = sliderHeight / 2;
         float yOffset = sliderHeight / 3;
@@ -85,7 +80,7 @@ public class TargetProcessUI : MonoBehaviour
 
     private void SetTargetProcessBar()
     {
-        itemSetUps = LoadItemSetup();
+        itemSetUps = LoadScene.Instance.LevelSetUpSO.ItemSetUp;
         baseItemNumber = itemSetUps.Sum(item => item.Number); 
 
         foreach (ItemSetUp itemSetup in itemSetUps)
@@ -99,36 +94,6 @@ public class TargetProcessUI : MonoBehaviour
             targetIconUIs.Add(newIconUI);
         }
         templateTargetIconUI.gameObject.SetActive(false);
-    }
-
-    private ItemSetUp[] LoadItemSetup()
-    {
-        LoadScene loadLevel = LoadScene.Instance;
-        int levelNumber;
-        if (loadLevel != null)
-        {
-            levelNumber = loadLevel.Level <= 0 ? 1 : loadLevel.Level;
-        }
-        else
-        {
-            levelNumber = 1;
-        }
-
-        LevelSetUpSO levelGridData = Resources.Load<LevelSetUpSO>(levelLoadPath + levelNumber);
-
-        if (levelGridData != null)
-        {
-            if (levelGridData.ItemTypes.Length < 2)
-            {
-                Debug.LogError("[ItemTraditionalSpawner] Number of ItemType can't less than 2");
-            }
-            return levelGridData.ItemSetUp;
-        }
-        else
-        {
-            Debug.LogWarning("[ItemTraditionalSpawner] " + "File" + levelLoadPath + levelNumber + " doesn't exist!");
-            return null;
-        }
     }
 
     public void UpdateProcess(ItemType itemType, int updatedValue)

@@ -18,6 +18,7 @@ public class UINavigator : MonoBehaviour
 
     private void Start()
     {
+        Time.timeScale = 1;
         AnimateBar();
         intoUI = GameObject.Find("MenuPage");
         settingUI = GameObject.Find("Panel_settingWindow");
