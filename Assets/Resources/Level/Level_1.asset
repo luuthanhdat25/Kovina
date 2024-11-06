@@ -21,10 +21,4 @@ MonoBehaviour:
     Number: 6
   widthSize: 3
   heightSize: 3
-  boxSetUps:
-  - Type: 0
-    XPosition: 0
-    YPosition: 0
-  - Type: 1
-    XPosition: 1
-    YPosition: 1
+  boxSetUps: []

@@ -51,4 +51,6 @@ MonoBehaviour:
   victorySound: {fileID: 11400000, guid: 56942f00a83462a4c970d085f6f37277, type: 2}
   lostSound: {fileID: 11400000, guid: 79801e795f3ee414791ce879c8dc0844, type: 2}
   roadMapBackGroundSound: {fileID: 11400000, guid: 809e7d033afa42d41a1a5949e55e9a1f, type: 2}
-  playingBackGroundSound: {fileID: 11400000, guid: e473dc555c43ee348a98f1900492004b, type: 2}
+  playingBackGroundSound: {fileID: 11400000, guid: 809e7d033afa42d41a1a5949e55e9a1f, type: 2}
+  explosiveBoxSound: {fileID: 11400000, guid: 6c6d68559ca0a2a4782c8aa79b01d7e4, type: 2}
+  quesitonBoxSound: {fileID: 11400000, guid: 2627dc69da9fc864293eed7b2501288a, type: 2}

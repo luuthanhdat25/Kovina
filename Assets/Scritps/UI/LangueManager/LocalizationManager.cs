@@ -53,6 +53,7 @@ public class LocalizationManager : Singleton<LocalizationManager>
         var x = loadedData.PauseData;
         AddTextToDictionary(loadedData.MenuText);
         AddTextPauseLangue(loadedData.PauseData);
+        AddTextCreditLangue(loadedData.Credit);
         AddSettingTextToDictionary(loadedData.SettingText);
     }
     private void AddTextPauseLangue(PauseData pauseData)
@@ -61,6 +62,20 @@ public class LocalizationManager : Singleton<LocalizationManager>
         {
             var key = property.Name;
             var pauseDatatext = (TextData)property.GetValue(pauseData);
+            localizedText[key] = new Dictionary<string, string>
+            {
+                { "English", pauseDatatext.English },
+                { "Vietnamese", pauseDatatext.Vietnamese },
+                { "Korean", pauseDatatext.Korean }
+            };
+        }
+    }
+    private void AddTextCreditLangue(Credit credit)
+    {
+        foreach (var property in typeof(Credit).GetFields())
+        {
+            var key = property.Name;
+            var pauseDatatext = (TextData)property.GetValue(credit);
 
 
             localizedText[key] = new Dictionary<string, string>
@@ -166,7 +181,13 @@ public class LocalizationData
     public LanguageText MenuText;
     public SettingData SettingText;
     public PauseData PauseData;
+    public Credit Credit;
     public string CurrentLanguage;
+}
+[System.Serializable]
+public class Credit
+{
+    public TextData Developer;
 }
 [System.Serializable]
 public class PauseData

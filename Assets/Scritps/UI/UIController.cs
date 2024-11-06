@@ -11,10 +11,11 @@ public class UIContronller : MonoBehaviour
     private Animator _animator;
     private UIEvenHandler controller = new UIEvenHandler();
     public string panelId;
-
+    [SerializeField] GameObject creditUI;
     private void Start()
     {
         _animator = GetComponent<Animator>();
+        creditUI.SetActive(false);
     }
     public void SetTriggerAnimation()
     {
@@ -29,7 +30,7 @@ public class UIContronller : MonoBehaviour
         }
         else if (playerActionOption == GameObject.Find("CreditButton"))
         {
-            Debug.Log("is Credit");
+            creditUI.SetActive(true);
         }
         else if (playerActionOption == GameObject.Find("ExitButton")) 
         {
@@ -49,5 +50,8 @@ public class UIContronller : MonoBehaviour
     {
         StartCoroutine(controller.ChangUIApearence(setting,this.gameObject));
     }
-    
+    public void CloseCredit()
+    {
+        creditUI.SetActive( false );
+    }
 }
