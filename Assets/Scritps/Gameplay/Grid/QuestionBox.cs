@@ -26,6 +26,7 @@ public class QuestionBox : MonoBehaviour, IObject
 
     private float DoAnimation()
     {
+        SoundManager.Instance.PlayQuestionBoxSound();
         Color spriteColor = spriteRenderer.color;
         spriteRenderer.sortingOrder = 5;
         LeanTween.scale(gameObject, scaleOutSizeMultiplier * transform.localScale, scaleOutDuration).setEase(LeanTweenType.easeOutQuad);

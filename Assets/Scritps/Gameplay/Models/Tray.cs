@@ -21,7 +21,7 @@ public class Tray : MonoBehaviour, IObject
     private List<Cell> cellInteractList = new List<Cell>();
 
     private List<ItemTraditional> itemTraditionalList = new List<ItemTraditional>();
-    private readonly float MOVE_ITEM_DURATION = 0.5F;
+    private readonly float MOVE_ITEM_DURATION = 0.6F;
     private readonly float COMPLETE_DURATION = 0.5F;
     private readonly float DESPAWN_DURATION = 0.3F;
     private Cell cellPlaced;
@@ -80,7 +80,7 @@ public class Tray : MonoBehaviour, IObject
                 }
             }
 
-            timeMatch += MOVE_ITEM_DURATION + 1f;
+            timeMatch += MOVE_ITEM_DURATION + .5f;
             sequence.append(1f);
             sequence.append(() =>
             {
@@ -124,7 +124,7 @@ public class Tray : MonoBehaviour, IObject
 
     private void MoveItemToPosition(ItemTraditional item, Transform pointPosition)
     {
-        LeanTween.move(item.gameObject, pointPosition.position, MOVE_ITEM_DURATION).setEase(LeanTweenType.easeInOutQuad);
+        LeanTween.move(item.gameObject, pointPosition.position, MOVE_ITEM_DURATION).setEase(LeanTweenType.easeInSine);
     }
 
     public void ClearItemTraditionalList()
@@ -293,6 +293,8 @@ public class Tray : MonoBehaviour, IObject
         {
             ItemType = itemTraditionalList[0].ItemType
         });
+
+        SoundManager.Instance.PlayMergeSound();
 
         sequence.append(
             LeanTween.scale(gameObject, Vector3.zero, COMPLETE_DURATION)
