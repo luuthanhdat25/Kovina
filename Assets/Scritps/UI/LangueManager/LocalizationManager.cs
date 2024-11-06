@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -25,14 +25,14 @@ public class LocalizationManager : Singleton<LocalizationManager>
         }
         else
         {
-            return;
         }
     }
 
     void LoadLocalization()
     {
-        TextAsset localizationFile = Resources.Load<TextAsset>("Localization/GameText");
+        LoadCurrentLanguage();
 
+        TextAsset localizationFile = Resources.Load<TextAsset>("Localization/GameText");
         if (localizationFile != null)
         {
             ParseLocalizationFile(localizationFile.text);
@@ -44,25 +44,50 @@ public class LocalizationManager : Singleton<LocalizationManager>
         }
     }
 
+    private void LoadCurrentLanguage()
+    {
+        string fullPath = Path.Combine(Application.persistentDataPath, "GameText.json");
+
+        if (File.Exists(fullPath))
+        {
+            string fileContent = File.ReadAllText(fullPath);
+            CurrentLanguage savedLanguage = JsonUtility.FromJson<CurrentLanguage>(fileContent);
+            currentLanguage = savedLanguage.currentLanguage;
+        }
+        else
+        {
+            currentLanguage = "English";
+            SaveCurrentLanguage();
+        }
+
+        Debug.Log("Current language loaded: " + currentLanguage);
+    }
+
+    private void SaveCurrentLanguage()
+    {
+        string fullPath = Path.Combine(Application.persistentDataPath, "GameText.json");
+        CurrentLanguage languageData = new CurrentLanguage { currentLanguage = currentLanguage };
+        string json = JsonUtility.ToJson(languageData, true);
+        File.WriteAllText(fullPath, json);
+    }
+
     private void ParseLocalizationFile(string jsonString)
     {
         var loadedData = JsonUtility.FromJson<LocalizationData>(jsonString);
-        currentLanguage = loadedData.CurrentLanguage;
-
         localizedText = new Dictionary<string, Dictionary<string, string>>();
-        var x = loadedData.PauseData;
+
         AddTextToDictionary(loadedData.MenuText);
         AddTextPauseLangue(loadedData.PauseData);
+        AddTextCreditLangue(loadedData.Credit);
         AddSettingTextToDictionary(loadedData.SettingText);
     }
+
     private void AddTextPauseLangue(PauseData pauseData)
     {
         foreach (var property in typeof(PauseData).GetFields())
         {
             var key = property.Name;
             var pauseDatatext = (TextData)property.GetValue(pauseData);
-
-
             localizedText[key] = new Dictionary<string, string>
             {
                 { "English", pauseDatatext.English },
@@ -71,13 +96,28 @@ public class LocalizationManager : Singleton<LocalizationManager>
             };
         }
     }
+
+    private void AddTextCreditLangue(Credit credit)
+    {
+        foreach (var property in typeof(Credit).GetFields())
+        {
+            var key = property.Name;
+            var creditText = (TextData)property.GetValue(credit);
+            localizedText[key] = new Dictionary<string, string>
+            {
+                { "English", creditText.English },
+                { "Vietnamese", creditText.Vietnamese },
+                { "Korean", creditText.Korean }
+            };
+        }
+    }
+
     private void AddTextToDictionary(LanguageText languageText)
     {
         foreach (var property in typeof(LanguageText).GetFields())
         {
             var key = property.Name;
             var textData = (TextData)property.GetValue(languageText);
-
             localizedText[key] = new Dictionary<string, string>
             {
                 { "English", textData.English },
@@ -86,45 +126,33 @@ public class LocalizationManager : Singleton<LocalizationManager>
             };
         }
     }
+
     private void AddSettingTextToDictionary(SettingData settingData)
     {
         foreach (var property in typeof(SettingData).GetFields())
         {
             var key = property.Name;
             var settingLanguage = (SettingLanguage)property.GetValue(settingData);
-
             var displayText = new Dictionary<string, string>
             {
                 { "English", settingLanguage.Display.English },
-                { "Vietnamese", settingLanguage.Display.Vietnamese },
-                { "Korean", settingLanguage.Display.Korean }
+                { "Vietnamese", settingLanguage.Display.Vietnamese }
             };
-
             localizedText[key + "_Display"] = displayText;
         }
     }
 
     public string GetLocalizedText(string key)
     {
-        if (!localizedText.ContainsKey(key))
+        if (localizedText.TryGetValue(key, out var languageTexts))
         {
-            Debug.LogWarning($"Key '{key}' does NOT exist in localizedText.");
-            return "Localized text not found";
+            if (languageTexts.TryGetValue(currentLanguage, out var text))
+            {
+                return text;
+            }
         }
 
-        if (localizedText[key].ContainsKey(currentLanguage))
-        {
-            Debug.Log($"Key '{key}' found for language '{currentLanguage}'.");
-            return localizedText[key][currentLanguage];
-        }
-
-        if (localizedText[key].ContainsKey(currentLanguage + "_Display"))
-        {
-            Debug.Log($"Key '{key}' found for language '{currentLanguage}_Display'.");
-            return localizedText[key][currentLanguage + "_Display"];
-        }
-
-        Debug.LogWarning($"No text found for key '{key}' and language '{currentLanguage}'.");
+        Debug.LogWarning($"Localized text for key '{key}' in language '{currentLanguage}' not found.");
         return "Localized text not found";
     }
 
@@ -136,38 +164,32 @@ public class LocalizationManager : Singleton<LocalizationManager>
     public void SetLanguage(string language)
     {
         currentLanguage = language;
-        UpdateCurrentLanguageInJson();
-        Debug.Log("Current language set to: " + currentLanguage);
+        SaveCurrentLanguage();
         OnLanguageChanged?.Invoke();
-    }
-
-    private void UpdateCurrentLanguageInJson()
-    {
-        TextAsset localizationFile = Resources.Load<TextAsset>("Localization/GameText");
-
-        if (localizationFile == null)
-        {
-            Debug.LogError("Localization file not found!");
-            return;
-        }
-
-        var localizationData = JsonUtility.FromJson<LocalizationData>(localizationFile.text);
-        localizationData.CurrentLanguage = currentLanguage;
-
-        string updatedJson = JsonUtility.ToJson(localizationData, true);
-        File.WriteAllText(Path.Combine(Application.dataPath, "Resources/Localization/GameText.json"), updatedJson);
     }
 }
 
-// Data classes
+[System.Serializable]
+public class CurrentLanguage
+{
+    public string currentLanguage;
+}
+
 [System.Serializable]
 public class LocalizationData
 {
     public LanguageText MenuText;
     public SettingData SettingText;
     public PauseData PauseData;
-    public string CurrentLanguage;
+    public Credit Credit;
 }
+
+[System.Serializable]
+public class Credit
+{
+    public TextData Developer;
+}
+
 [System.Serializable]
 public class PauseData
 {

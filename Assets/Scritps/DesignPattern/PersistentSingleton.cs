@@ -36,7 +36,7 @@ public class PersistentSingleton<T> : MonoBehaviour where T : Component
     /// <summary>
     /// Overrides the Awake method to ensure there is only one instance of the Singleton.
     /// </summary>
-    private void Awake()
+    protected virtual void Awake()
     {
         RemoveDuplicates();
     }

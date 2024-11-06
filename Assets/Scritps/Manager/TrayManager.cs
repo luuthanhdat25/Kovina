@@ -63,7 +63,7 @@ public class TrayManager : Singleton<TrayManager>
             trayUIContainer.OnEnableTraysUI();
         }
         trayPlaced.SetCellPlaced(cellPlaced);
-
+        SoundManager.Instance.PlayPutDownSound();
         // Do Algorithm
         List<Cell> cellsHoriList = MainGrid.Instance.GetCellsHorizontal(cellPlaced);
         List<Cell> cellsVertiList = MainGrid.Instance.GetCellsVertical(cellPlaced);
@@ -128,17 +128,20 @@ public class TrayManager : Singleton<TrayManager>
             if (countFrequence == 2 && GetFirstTrayHasNumberOfItem(itemTypeMostFrequence, trayAroundList, 2) == null)
             {
                 Tray firstTrayHas1Item = GetFirstTrayHasNumberOfItem(itemTypeMostFrequence, trayAroundList, 1);
-                ItemTraditional itemMatch = firstTrayHas1Item.GetItemTraditionalsList().FirstOrDefault(item => item.ItemType == itemTypeMostFrequence);
-                ItemTraditional itemNotMatch = trayCenter.GetItemTraditionalsList().FirstOrDefault(item => item.ItemType != itemTypeMostFrequence);
-                firstTrayHas1Item.RemoveItem(itemMatch);
-                trayCenter.RemoveItem(itemNotMatch);
+                if(firstTrayHas1Item != null)
+                {
+                    ItemTraditional itemMatch = firstTrayHas1Item.GetItemTraditionalsList().FirstOrDefault(item => item.ItemType == itemTypeMostFrequence);
+                    ItemTraditional itemNotMatch = trayCenter.GetItemTraditionalsList().FirstOrDefault(item => item.ItemType != itemTypeMostFrequence);
+                    firstTrayHas1Item.RemoveItem(itemMatch);
+                    trayCenter.RemoveItem(itemNotMatch);
 
-                trayCenter.AddItem(itemMatch);
-                firstTrayHas1Item.AddItem(itemNotMatch);
+                    trayCenter.AddItem(itemMatch);
+                    firstTrayHas1Item.AddItem(itemNotMatch);
 
-                var duration1 = trayCenter.ShortAndMoveItemToPositionOrDespawn();
-                var duration2 = firstTrayHas1Item.ShortAndMoveItemToPositionOrDespawn();
-                timeMatch += Mathf.Max(duration1, duration2);
+                    var duration1 = trayCenter.ShortAndMoveItemToPositionOrDespawn();
+                    var duration2 = firstTrayHas1Item.ShortAndMoveItemToPositionOrDespawn();
+                    timeMatch += Mathf.Max(duration1, duration2);
+                }
             }
             else
             {
@@ -277,17 +280,20 @@ public class TrayManager : Singleton<TrayManager>
                 if(countFrequence == 2 && GetFirstTrayHasNumberOfItem(itemTypeMostFrequence, trayAroundList, 2) == null)
                 {
                     Tray firstTrayHas1Item = GetFirstTrayHasNumberOfItem(itemTypeMostFrequence, trayAroundList, 1);
-                    ItemTraditional itemMatch = firstTrayHas1Item.GetItemTraditionalsList().FirstOrDefault(item => item.ItemType == itemTypeMostFrequence);
-                    ItemTraditional itemNotMatch = trayCenter.GetItemTraditionalsList().FirstOrDefault(item => item.ItemType != itemTypeMostFrequence);
-                    firstTrayHas1Item.RemoveItem(itemMatch);
-                    trayCenter.RemoveItem(itemNotMatch);
+                    if(firstTrayHas1Item != null)
+                    {
+                        ItemTraditional itemMatch = firstTrayHas1Item.GetItemTraditionalsList().FirstOrDefault(item => item.ItemType == itemTypeMostFrequence);
+                        ItemTraditional itemNotMatch = trayCenter.GetItemTraditionalsList().FirstOrDefault(item => item.ItemType != itemTypeMostFrequence);
+                        firstTrayHas1Item.RemoveItem(itemMatch);
+                        trayCenter.RemoveItem(itemNotMatch);
 
-                    trayCenter.AddItem(itemMatch);
-                    firstTrayHas1Item.AddItem(itemNotMatch);
+                        trayCenter.AddItem(itemMatch);
+                        firstTrayHas1Item.AddItem(itemNotMatch);
 
-                    var duration1 = trayCenter.ShortAndMoveItemToPositionOrDespawn();
-                    var duration2 = firstTrayHas1Item.ShortAndMoveItemToPositionOrDespawn();
-                    timeMatch += Mathf.Max(duration1, duration2);
+                        var duration1 = trayCenter.ShortAndMoveItemToPositionOrDespawn();
+                        var duration2 = firstTrayHas1Item.ShortAndMoveItemToPositionOrDespawn();
+                        timeMatch += Mathf.Max(duration1, duration2);
+                    }
                 }
                 else
                 {
@@ -502,7 +508,6 @@ public class TrayManager : Singleton<TrayManager>
         {
             return 0;
         }
-        SoundManager.Instance.PlayMergeSound();
     }
 
     private (ItemType, int count) GetMostFrequentItemType(List<ItemTraditional> sortedItemList)
@@ -587,7 +592,7 @@ public class TrayManager : Singleton<TrayManager>
         trayUnplaced.Clear();
         for (int i = 0; i < TRAY_UI_MAXIMUM; i++)
         {
-            Debug.Log($"[TrayManager] OnTrayPlaced: {i}");
+            //Debug.Log($"[TrayManager] OnTrayPlaced: {i}");
             Tray trayComponent = CreateUnplacedTray(i, TRAY_START_POSITION);
             trayComponent.gameObject.SetActive(false);
             CreateItemOnTray(trayComponent, i);
@@ -711,7 +716,7 @@ public class TrayManager : Singleton<TrayManager>
         }
 
         trayUnplaced.Add(trayComponent);
-        Debug.Log($"TrayManager: add {trayComponent} element to trayUnplaced |SUCCESS|");
+        //Debug.Log($"TrayManager: add {trayComponent} element to trayUnplaced |SUCCESS|");
     }
 
     private void AddNewTrayToPlaced(int index)

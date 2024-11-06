@@ -8,14 +8,16 @@ using UnityEngine.UI;
 public class SoundManager : Singleton<SoundManager>
 {
 
-    [SerializeField] private SoundSo menuBackgroundSound;
-    [SerializeField] private SoundSo clickSound;
-    [SerializeField] private SoundSo mergedSound;
-    [SerializeField] private SoundSo putDownSound;
-    [SerializeField] private SoundSo victorySound;
-    [SerializeField] private SoundSo lostSound;
-    [SerializeField] private SoundSo roadMapBackGroundSound;
-    [SerializeField] private SoundSo playingBackGroundSound;
+    [SerializeField] private SoundSO menuBackgroundSound;
+    [SerializeField] private SoundSO clickSound;
+    [SerializeField] private SoundSO mergedSound;
+    [SerializeField] private SoundSO putDownSound;
+    [SerializeField] private SoundSO victorySound;
+    [SerializeField] private SoundSO lostSound;
+    [SerializeField] private SoundSO roadMapBackGroundSound;
+    [SerializeField] private SoundSO playingBackGroundSound;
+    [SerializeField] private SoundSO explosiveBoxSound;
+    [SerializeField] private SoundSO quesitonBoxSound;
 
     private Button[] buttons;
     void Start()
@@ -65,13 +67,13 @@ public class SoundManager : Singleton<SoundManager>
     public void PlayMergeSound()
     {
         Debug.Log("play merge sound");
-        SoundPooling.Instance.CreateSound (mergedSound, 0,0);
+        SoundPooling.Instance.CreateSound (mergedSound, -0.1f, 0.1f);
     }
 
     public void PlayPutDownSound()
     {
         Debug.Log("play put down sound");
-        SoundPooling.Instance.CreateSound(putDownSound, 0,0);
+        SoundPooling.Instance.CreateSound(putDownSound, -0.1f, 0.1f);
     }
 
     public void PlayVictorySound()
@@ -94,5 +96,15 @@ public class SoundManager : Singleton<SoundManager>
     {
         Debug.Log("Play Playing Background Sound");
         SoundPooling.Instance.CreateSound(playingBackGroundSound, 0, 0);
+    }
+
+    public void PlayExplosiveBoxSound()
+    {
+        SoundPooling.Instance.CreateSound(explosiveBoxSound, -0.1f, 0.1f);
+    }
+
+    public void PlayQuestionBoxSound()
+    {
+        SoundPooling.Instance.CreateSound(quesitonBoxSound, -0.1f, 0.1f);
     }
 }

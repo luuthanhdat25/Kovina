@@ -53,6 +53,7 @@ public class ExplosiveBox : MonoBehaviour, IObject
 
     private void SpawnEffect()
     {
+        SoundManager.Instance.PlayExplosiveBoxSound();
         ParticleSystem effect = Instantiate(explosionEffect, transform.position, Quaternion.identity);
         Destroy(effect.gameObject, effect.main.duration + effect.main.startLifetime.constantMax);
     }

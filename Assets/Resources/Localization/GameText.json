@@ -56,5 +56,12 @@
             "Korean": "로드맵으로 돌아가기"
         }
     },
+    "Credit": {
+        "Developer": {
+            "English": "Developer",
+            "Vietnamese": "Lập Trình bởi",
+            "Korean": "개발자"
+        }
+    },
     "CurrentLanguage": "Vietnamese"
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -6,9 +5,6 @@ using UnityEngine.UI;
 
 public class TargetProcessUI : MonoBehaviour
 {
-    [SerializeField]
-    private string levelLoadPath = "Level/Level_";
-
     [SerializeField]
     private TargetIconUI templateTargetIconUI;
 
@@ -20,9 +16,6 @@ public class TargetProcessUI : MonoBehaviour
 
     [SerializeField]
     private StarProcessUI[] starProcessUIs;
-
-    [SerializeField]
-    private RectTransform topSlider, botSlider;
 
     private List<TargetIconUI> targetIconUIs = new List<TargetIconUI>();
     private ItemSetUp[] itemSetUps;
@@ -38,21 +31,17 @@ public class TargetProcessUI : MonoBehaviour
 
     private void PositionStars()
     {
-        RectTransform fillArea = processSlider.fillRect;
+        RectTransform fillArea = processSlider.GetComponent<RectTransform>();
         float sliderHeight = fillArea.rect.height;
 
-        float distance = sliderHeight / 3;
-        Debug.Log($"Distance between each star: {distance}");
-
-        Vector3 fillAreaPosition = fillArea.position;
-        float yOffset = distance;
+        float startY = sliderHeight / 2;
+        float yOffset = sliderHeight / 3;
 
         for (int i = 0; i < starProcessUIs.Length; i++)
         {
-            Vector3 starPosition = fillAreaPosition + Vector3.up * yOffset;
-            yOffset += distance;
             RectTransform rectTransform = starProcessUIs[i].GetComponent<RectTransform>();
-            rectTransform.position = starPosition;
+            rectTransform.localPosition = new Vector3(0, startY - i * yOffset, 0);
+            Debug.Log(rectTransform.localPosition);
         }
     }
 
@@ -68,9 +57,30 @@ public class TargetProcessUI : MonoBehaviour
         }
     }
 
+    public int GetCurrentStars()
+    {
+        float currentValue = processSlider.value;
+        int starCount = 0;
+
+        for (int i = 0; i < starMilestones.Length; i++)
+        {
+            if (currentValue >= starMilestones[i])
+            {
+                starCount++;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return starCount;
+    }
+
+
     private void SetTargetProcessBar()
     {
-        itemSetUps = LoadItemSetup();
+        itemSetUps = (ItemSetUp[])LoadScene.Instance.LevelSetUpSO.ItemSetUp.Clone();
         baseItemNumber = itemSetUps.Sum(item => item.Number); 
 
         foreach (ItemSetUp itemSetup in itemSetUps)
@@ -84,36 +94,6 @@ public class TargetProcessUI : MonoBehaviour
             targetIconUIs.Add(newIconUI);
         }
         templateTargetIconUI.gameObject.SetActive(false);
-    }
-
-    private ItemSetUp[] LoadItemSetup()
-    {
-        LoadScene loadLevel = LoadScene.Instance;
-        int levelNumber;
-        if (loadLevel != null)
-        {
-            levelNumber = loadLevel.Level <= 0 ? 1 : loadLevel.Level;
-        }
-        else
-        {
-            levelNumber = 1;
-        }
-
-        LevelSetUpSO levelGridData = Resources.Load<LevelSetUpSO>(levelLoadPath + levelNumber);
-
-        if (levelGridData != null)
-        {
-            if (levelGridData.ItemTypes.Length < 2)
-            {
-                Debug.LogError("[ItemTraditionalSpawner] Number of ItemType can't less than 2");
-            }
-            return levelGridData.ItemSetUp;
-        }
-        else
-        {
-            Debug.LogWarning("[ItemTraditionalSpawner] " + "File" + levelLoadPath + levelNumber + " doesn't exist!");
-            return null;
-        }
     }
 
     public void UpdateProcess(ItemType itemType, int updatedValue)
@@ -141,15 +121,16 @@ public class TargetProcessUI : MonoBehaviour
 
                     if (value == 1)
                     {
-                        starProcessUIs[2].ShowItem();
+                        starProcessUIs[0].ShowItem();
+                        GameManager.Instance.GameOver();
                     }
-                    else if (value > 2f / 3f)
+                    else if (value >= 2f / 3f)
                     {
                         starProcessUIs[1].ShowItem();
                     }
-                    else if (value > 1f / 3f)
+                    else if (value >= 1f / 3f)
                     {
-                        starProcessUIs[0].ShowItem();
+                        starProcessUIs[2].ShowItem();
                     }
                 }).setEase(LeanTweenType.easeInSine);
         } 
