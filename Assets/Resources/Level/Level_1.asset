@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95860ea997dae224bb7c6220e8fb1c22, type: 3}
   m_Name: Level_1
   m_EditorClassIdentifier: 
+  timePlay: 180
   itemSetUp:
   - ItemType: 0
     Number: 6

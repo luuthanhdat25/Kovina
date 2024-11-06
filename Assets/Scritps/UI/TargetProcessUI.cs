@@ -80,7 +80,7 @@ public class TargetProcessUI : MonoBehaviour
 
     private void SetTargetProcessBar()
     {
-        itemSetUps = LoadScene.Instance.LevelSetUpSO.ItemSetUp;
+        itemSetUps = (ItemSetUp[])LoadScene.Instance.LevelSetUpSO.ItemSetUp.Clone();
         baseItemNumber = itemSetUps.Sum(item => item.Number); 
 
         foreach (ItemSetUp itemSetup in itemSetUps)
